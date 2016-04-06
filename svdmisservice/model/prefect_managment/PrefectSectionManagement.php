@@ -112,26 +112,26 @@ class PrefectSectionManagement {
     }
 	  
 	/**
-     * Fetching prefect possition by pos_name
+     * Fetching prefect section by sec_name
 	 *
-     * @param String $pos_name possition name
+     * @param String $sec_name section name
 	 *
-	 *@return prefect possition object only needed data
+	 *@return prefect section object only needed data
      */
-    public function getPossitionByPossitionName($pos_name) {
-        $stmt = $this->conn->prepare("SELECT pos_name, status, recode_added_at, recode_added_by FROM prefect_possition WHERE pos_name = ? and (status=1 or status=2)");
-        $stmt->bind_param("s", $pos_name);
+    public function getSectionBySectionName($sec_name) {
+        $stmt = $this->conn->prepare("SELECT sec_name, status, recode_added_at, recode_added_by FROM prefect_section WHERE sec_name = ? and (status=1 or status=2)");
+        $stmt->bind_param("s", $sec_name);
         if ($stmt->execute()) {
-            $stmt->bind_result($pos_name,$status, $recode_added_at, $recode_added_by);
+            $stmt->bind_result($sec_name,$status, $recode_added_at, $recode_added_by);
             $stmt->fetch();
-            $possition = array();
-            $possition["pos_name"] = $pos_name;
-            $possition["status"] = $status;
-            $possition["recode_added_at"] = $recode_added_at;
-			$possition["recode_added_by"] = $recode_added_by;
+            $section = array();
+            $section["sec_name"] = $sec_name;
+            $section["status"] = $status;
+            $section["recode_added_at"] = $recode_added_at;
+			$section["recode_added_by"] = $recode_added_by;
 
             $stmt->close();
-            return $possition;
+            return $section;
         } else {
             return NULL;
         }
@@ -139,16 +139,16 @@ class PrefectSectionManagement {
   
   
 	/**
-     * Fetching all prefect possitions
+     * Fetching all prefect sections
 	 *
-     * @return $possition object set of all possitions
+     * @return $section object set of all sections
      */
-    public function getAllPossitions() {
-        $stmt = $this->conn->prepare("SELECT * FROM prefect_possition WHERE status = 1 or  status = 2");
+    public function getAllSections() {
+        $stmt = $this->conn->prepare("SELECT * FROM prefect_section WHERE status = 1 or  status = 2");
         $stmt->execute();
-        $possitions = $stmt->get_result();
+        $sections = $stmt->get_result();
         $stmt->close();
-        return $possitions;
+        return $sections;
     }
 	
   
@@ -163,7 +163,7 @@ class PrefectSectionManagement {
 	/**
      * Checking for duplicate sections by sec_name
      *
-     * @param String $sec_name Possition name to check in db
+     * @param String $sec_name Section name to check in db
      *
      * @return boolean
      */

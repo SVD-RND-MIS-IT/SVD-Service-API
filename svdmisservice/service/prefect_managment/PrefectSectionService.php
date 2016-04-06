@@ -128,19 +128,19 @@ $app->delete('/prefect_section_delete', 'authenticate', function() use ($app) {
 
 		
 /**
- * get one prefect possition
+ * get one prefect section
  * method GET
- * url /prefectPossition/:possitionsName       
+ * url /prefectSection/:sectionsName       
  */
-$app->get('/prefectPossition/:pos_name', 'authenticate', function($pos_name) {
+$app->get('/prefectSection/:sec_name', 'authenticate', function($sec_name) {
             global $currunt_user_id;
             $response = array();
             
-			$prefectPossitionManagement = new PrefectPossitionManagement();
-			$res = $prefectPossitionManagement->getPossitionByPossitionName($pos_name);
+			$prefectSectionManagement = new PrefectSectionManagement();
+			$res = $prefectSectionManagement->getSectionBySectionName($sec_name);
 
             $response["error"] = false;
-            $response["possition"] = $res;
+            $response["section"] = $res;
 
             
 
@@ -148,31 +148,31 @@ $app->get('/prefectPossition/:pos_name', 'authenticate', function($pos_name) {
         });
 
 /**
- * Listing all prefect possitions
+ * Listing all prefect sections
  * method GET
- * url /prefectPossitions        
+ * url /prefectSections        
  */
-$app->get('/prefectPossitions', 'authenticate', function() {
+$app->get('/prefectSections', 'authenticate', function() {
             global $user_id;
 			
             $response = array();
 			
-            $prefectPossitionManagement = new PrefectPossitionManagement();
-			$res = $prefectPossitionManagement->getAllPossitions();
+            $prefectSectionManagement = new PrefectSectionManagement();
+			$res = $prefectSectionManagement->getAllSections();
 
             $response["error"] = false;
-            $response["possitions"] = array();
+            $response["sections"] = array();
 
-            // looping through result and preparing possitions array
-            while ($possitions = $res->fetch_assoc()) {
+            // looping through result and preparing sections array
+            while ($sections = $res->fetch_assoc()) {
                 $tmp = array();
 				
-                $tmp["pos_name"] = $possitions["pos_name"];
-                $tmp["status"] = $possitions["status"];
-                $tmp["recode_added_at"] = $possitions["recode_added_at"];
-				$tmp["recode_added_by"] = $possitions["recode_added_by"];
+                $tmp["sec_name"] = $sections["sec_name"];
+                $tmp["status"] = $sections["status"];
+                $tmp["recode_added_at"] = $sections["recode_added_at"];
+				$tmp["recode_added_by"] = $sections["recode_added_by"];
 				
-                array_push($response["possitions"], $tmp);
+                array_push($response["sections"], $tmp);
             }
 
             echoRespnse(200, $response);
