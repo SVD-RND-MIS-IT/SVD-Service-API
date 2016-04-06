@@ -70,29 +70,29 @@ class PrefectSectionManagement {
 	
 	
 /**
-     * Delete prefect possition
+     * Delete prefect section
      *
-     * @param String $tal_name Talant name for the system
+     * @param String $sec_name Section name for the system
 	 * @param String $recode_added_by
      *
      * @return database transaction status
      */
-    public function deletePrefectPossition($pos_name, $recode_added_by) {
+    public function deletePrefectSection($sec_name, $recode_added_by) {
 
 		
         $response = array();
-        // First check if possition already existed in db
-        if ($this->isPossitionExists($pos_name)) {
+        // First check if section already existed in db
+        if ($this->isSectionExists($sec_name)) {
            			
 			//
-			$stmt = $this->conn->prepare("UPDATE prefect_possition set status = 3, recode_modified_at = now() , recode_modified_by = ? where pos_name = ? and (status=1 or  status=2)");
-			$stmt->bind_param("is",$recode_added_by, $pos_name);
+			$stmt = $this->conn->prepare("UPDATE prefect_section set status = 3, recode_modified_at = now() , recode_modified_by = ? where sec_name = ? and (status=1 or  status=2)");
+			$stmt->bind_param("is",$recode_added_by, $sec_name);
 			$result = $stmt->execute();
 			
             $stmt->close();
 
         } else {
-            // Possition is not already existed in the db
+            //Section is not already existed in the db
             return NOT_EXISTED;
         }
 		
@@ -100,10 +100,10 @@ class PrefectSectionManagement {
 
         // Check for successful insertion
         if ($result) {
-			// possition successfully deleted
+			// section successfully deleted
             return DELETE_SUCCESSFULLY;
         } else {
-            // Failed to delete possition
+            // Failed to delete section
             return DELETE_FAILED;
         }
         

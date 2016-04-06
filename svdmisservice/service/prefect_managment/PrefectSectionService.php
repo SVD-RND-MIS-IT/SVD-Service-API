@@ -91,35 +91,35 @@ $app->post('/prefect_section_register',  'authenticate', function() use ($app) {
 
 
 /**
- * Prefect Possition Delete
- * url - /prefect_possition_delete
+ * Prefect Section Delete
+ * url - /prefect_section_delete
  * method - DELETE
- * params - pos_name
+ * params - sec_name
  */
-$app->delete('/prefect_possition_delete', 'authenticate', function() use ($app) {
+$app->delete('/prefect_section_delete', 'authenticate', function() use ($app) {
 	
             // check for required params
-            verifyRequiredParams(array('pos_name'));
+            verifyRequiredParams(array('sec_name'));
 			
 			global $currunt_user_id;
 
             $response = array();
 
 			// reading post params
-            $pos_name = $app->request->delete('pos_name');
+            $sec_name = $app->request->delete('sec_name');
 			
-            $prefectPossitionManagement = new PrefectPossitionManagement();
-			$res = $prefectPossitionManagement->deletePrefectPossition($pos_name, $currunt_user_id);
+            $prefectSectionManagement= new PrefectSectionManagement();
+			$res = $prefectSectionManagement->deletePrefectSection($sec_name, $currunt_user_id);
 			
             if ($res == DELETE_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "Possition is successfully deleted";
+                $response["message"] = "Section is successfully deleted";
             } else if ($res == DELETE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while deleting possition";
+                $response["message"] = "Oops! An error occurred while deleting section";
             } else if ($res == NOT_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this possition is not exist";
+                $response["message"] = "Sorry, this section is not exist";
             }
             // echo json response
             echoRespnse(201, $response);
