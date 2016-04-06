@@ -128,19 +128,19 @@ $app->delete('/prefect_possition_delete', 'authenticate', function() use ($app) 
 
 		
 /**
- * get one talant
+ * get one prefect possition
  * method GET
- * url /talant/:talantsName       
+ * url /prefectPossition/:possitionsName       
  */
-$app->get('/talant/:tal_name', 'authenticate', function($tal_name) {
+$app->get('/prefectPossition/:pos_name', 'authenticate', function($pos_name) {
             global $currunt_user_id;
             $response = array();
             
-			$talantsManagement = new TalantsManagement();
-			$res = $talantsManagement->getTalantByTalantName($tal_name);
+			$prefectPossitionManagement = new PrefectPossitionManagement();
+			$res = $prefectPossitionManagement->getPossitionByPossitionName($pos_name);
 
             $response["error"] = false;
-            $response["talant"] = $res;
+            $response["possition"] = $res;
 
             
 
@@ -148,31 +148,31 @@ $app->get('/talant/:tal_name', 'authenticate', function($tal_name) {
         });
 
 /**
- * Listing all talants
+ * Listing all prefect possitions
  * method GET
- * url /talants        
+ * url /prefectPossitions        
  */
-$app->get('/talants', 'authenticate', function() {
+$app->get('/prefectPossitions', 'authenticate', function() {
             global $user_id;
 			
             $response = array();
 			
-            $talantsManagement = new TalantsManagement();
-			$res = $talantsManagement->getAllTalants();
+            $prefectPossitionManagement = new PrefectPossitionManagement();
+			$res = $prefectPossitionManagement->getAllPossitions();
 
             $response["error"] = false;
-            $response["talants"] = array();
+            $response["possitions"] = array();
 
-            // looping through result and preparing talants array
-            while ($talants = $res->fetch_assoc()) {
+            // looping through result and preparing possitions array
+            while ($possitions = $res->fetch_assoc()) {
                 $tmp = array();
 				
-                $tmp["tal_name"] = $talants["tal_name"];
-                $tmp["status"] = $talants["status"];
-                $tmp["recode_added_at"] = $talants["recode_added_at"];
-				$tmp["recode_added_by"] = $talants["recode_added_by"];
+                $tmp["pos_name"] = $possitions["pos_name"];
+                $tmp["status"] = $possitions["status"];
+                $tmp["recode_added_at"] = $possitions["recode_added_at"];
+				$tmp["recode_added_by"] = $possitions["recode_added_by"];
 				
-                array_push($response["talants"], $tmp);
+                array_push($response["possitions"], $tmp);
             }
 
             echoRespnse(200, $response);
