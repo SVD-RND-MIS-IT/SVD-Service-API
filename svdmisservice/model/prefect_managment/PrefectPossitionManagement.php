@@ -70,29 +70,29 @@ class PrefectPossitionManagement {
 	
 	
 /**
-     * Delete talant
+     * Delete prefect possition
      *
      * @param String $tal_name Talant name for the system
 	 * @param String $recode_added_by
      *
      * @return database transaction status
      */
-    public function deleteTalant($tal_name, $recode_added_by) {
+    public function deletePrefectPossition($pos_name, $recode_added_by) {
 
 		
         $response = array();
-        // First check if talant already existed in db
-        if ($this->isTalantExists($tal_name)) {
+        // First check if possition already existed in db
+        if ($this->isPossitionExists($pos_name)) {
            			
 			//
-			$stmt = $this->conn->prepare("UPDATE talants set status = 3, recode_modified_at = now() , recode_modified_by = ? where tal_name = ? and (status=1 or  status=2)");
-			$stmt->bind_param("is",$recode_added_by, $tal_name);
+			$stmt = $this->conn->prepare("UPDATE prefect_possition set status = 3, recode_modified_at = now() , recode_modified_by = ? where pos_name = ? and (status=1 or  status=2)");
+			$stmt->bind_param("is",$recode_added_by, $pos_name);
 			$result = $stmt->execute();
 			
             $stmt->close();
 
         } else {
-            // Talant is not already existed in the db
+            // Possition is not already existed in the db
             return NOT_EXISTED;
         }
 		
@@ -100,10 +100,10 @@ class PrefectPossitionManagement {
 
         // Check for successful insertion
         if ($result) {
-			// talant successfully deleted
+			// possition successfully deleted
             return DELETE_SUCCESSFULLY;
         } else {
-            // Failed to delete talant
+            // Failed to delete possition
             return DELETE_FAILED;
         }
         
