@@ -8,7 +8,7 @@ require_once '../../model/commen/PassHash.php';
  *
  */
 
-class SchoolManagement {
+class StudentSchoolManagement {
 
     private $conn;
 
@@ -33,16 +33,16 @@ class SchoolManagement {
      *
      * @return database transaction status
      */
-    public function createSchool($sch_name, $sch_situated_in, $recode_added_by) {
+    public function createStudentSchool($stu_id, $sch_id, $attend_year, $recode_added_by) {
 
         $response = array();
 		
         // First check if Talant already existed in db
-        if (!$this->isSchoolExists($sch_name)) {
+        if (!$this->isStudentSchoolExists($stu_id, $sch_id)) {
   
             // insert query
-			 $stmt = $this->conn->prepare("INSERT INTO school(sch_name, sch_situated_in, recode_added_by) values(?, ?, ?)");
-			 $stmt->bind_param("ssi", $sch_name, $sch_situated_in, $recode_added_by );
+			 $stmt = $this->conn->prepare("INSERT INTO student_school(stu_id, sch_id, attend_year, recode_added_by) values(?, ?, ?, ?)");
+			 $stmt->bind_param("iiii", $stu_id, $sch_id, $attend_year, $recode_added_by );
 			 $result = $stmt->execute();
 
 			 $stmt->close();
@@ -167,9 +167,9 @@ class SchoolManagement {
      *
      * @return boolean
      */
-    private function isSchoolExists($sch_name) {
-		$stmt = $this->conn->prepare("SELECT sch_name from school WHERE (status = 1 or status = 2)  and sch_name = ?  ");
-        $stmt->bind_param("s",$sch_name);
+    private function isStudentSchoolExists($stu_id, $sch_id) {
+		$stmt = $this->conn->prepare("SELECT stu_id from student_school WHERE (status = 1 or status = 2)  and stu_id = ?  and sch_id = ?");
+        $stmt->bind_param("ii", $stu_id, $sch_id);
         $stmt->execute();
 		$stmt->store_result();
         $num_rows = $stmt->num_rows;

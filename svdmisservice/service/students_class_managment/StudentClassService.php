@@ -1,6 +1,6 @@
 <?php
 require_once '../../model/user_management/OperationalUserManagement.php';
-require_once '../../model/student_guardiant_management/OccupationTypeManagement.php';
+require_once '../../model/students_class_managment/StudentClassManagement.php';
 require '../.././config/libs/Slim/Slim.php';
 
 \Slim\Slim::registerAutoloader();
@@ -20,7 +20,7 @@ function authenticate(\Slim\Route $route) {
     $response = array();
     $app = \Slim\Slim::getInstance();
 
-   // Verifying Authorization Header
+    // Verifying Authorization Header
     if (isset($headers['Authorization'])) {
         $operationalUserManagement = new OperationalUserManagement();
 
@@ -48,76 +48,76 @@ function authenticate(\Slim\Route $route) {
 }
 
 /*
- * ------------------------ OCCUPATION TYPE TABLE METHODS ------------------------
+ * ------------------------ CLASS TABLE METHODS ------------------------
  */
  
 /**
- * Occupation_type Registration
- * url - /occupation_type_register
+ * Class Registration
+ * url - /class_register
  * method - POST
- * params - occ_type_name, 	occ_type_description
+ * params - clz_grade, clz_class
  */
-$app->post('/occupation_type_register',  function() use ($app) {
+$app->post('/student_class_register',  function() use ($app) {
 	
             // check for required params
-            verifyRequiredParams(array('occ_type_name', 'occ_type_description' ));
+            verifyRequiredParams(array('year', 'stu_id', 'clz_id'));
 			
 			global $currunt_user_id;
 
             $response = array();
 
             // reading post params
-            $occ_type_name = $app->request->post('occ_type_name');
-            $occ_type_description = $app->request->post('occ_type_description');
+            $year = $app->request->post('year');
+            $stu_id = $app->request->post('stu_id');
+			$clz_id = $app->request->post('clz_id');
            
-            $occupationTypeManagement = new occupationTypeManagement();
-			$res = $occupationTypeManagement->createOccupation_type($occ_type_name, $occ_type_description, 1);
+            $studentClassManagement = new StudentClassManagement();
+			$res = $studentClassManagement->createStudentClass($year, $stu_id, $clz_id, 1);
 			
             if ($res == CREATED_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "Occupation type is successfully registered";
+                $response["message"] = "StudentClass is successfully registered";
             } else if ($res == CREATE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while registereing occupation type";
+                $response["message"] = "Oops! An error occurred while registereing StudentClass";
             } else if ($res == ALREADY_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this occupation type already exist";
+                $response["message"] = "Sorry, this StudentClass already exist";
             }
             // echo json response
             echoRespnse(201, $response);
         });
 
 /**
- * Occupation_type Update
- * url - /occupation_type_updates
+ * Exam Update
+ * url - /exam_update/:examName
  * method - PUT
- * params - occ_type_name, occ_type_description
+ * params - clz_grade, exm_discription
  */
-$app->put('/occupation_type_updates','authenticate', function() use ($app) {
+$app->put('/exam_update/:examName',  'authenticate', function($clz_grade) use ($app) {
 	
-             // check for required params
-            verifyRequiredParams(array('occ_type_name', 'occ_type_description' ));
+            // check for required params
+            verifyRequiredParams(array( 'exm_discription'));
 			
 			global $currunt_user_id;
 
             $response = array();
 
             // reading put params
-			$occ_type_name = $app->request->put('occ_type_name'); 
-            $occ_type_description = $app->request->put('occ_type_description'); 
-			
-            $occupationTypeManagement = new OccupationTypeManagement();
-			$res = $occupationTypeManagement->updateOccupation_type($occ_type_name, $occ_type_description, $currunt_user_id);
+            $exm_discription = $app->request->put('exm_discription');
+
+            $examManagement = new ExamManagement();
+			$res = $examManagement->updateExam($exm_name, $exm_discription,$currunt_user_id);
 			
             if ($res == UPDATE_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "Occupation type is Updated";
+                $response["message"] = "You are successfully updated exam";
             } else if ($res == UPDATE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while updating occupation type ";
+                $response["message"] = "Oops! An error occurred while updating exam";
             } else if ($res == NOT_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry,this occupation type not exist";
+                $response["message"] = "Sorry, this exam is not exist";
             }
             // echo json response
             echoRespnse(201, $response);
@@ -125,36 +125,31 @@ $app->put('/occupation_type_updates','authenticate', function() use ($app) {
 
 
 /**
- * Occupation_type Delete
- * url - /occupation_type_delete
+ * Exam Delete
+ * url - /exam_delete
  * method - DELETE
- * params -occ_type_name
+ * params - exm_name/:examName
  */
-$app->delete('/occupation_type_delete', 'authenticate', function() use ($app) {
+$app->delete('/exam_delete/:examName', 'authenticate', function($clz_grade) use ($app) {
 	
-            // check for required params
-            verifyRequiredParams(array('occ_type_name'));
-			
+            
 			global $currunt_user_id;
 
-			// reading put params
-			$occ_type_name = $app->request->delete('occ_type_name'); 
-			
             $response = array();
 
 			
-			$occupationTypeManagement = new OccupationTypeManagement();
-			$res = $occupationTypeManagement->deleteOccupationType($occ_type_name,$currunt_user_id);
+            $examManagement = new ExamManagement();
+			$res = $examManagement->deleteExam($exm_name, $currunt_user_id);
 			
             if ($res == DELETE_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "Occupation_type is successfully deleted";
+                $response["message"] = "Exam is successfully deleted";
             } else if ($res == DELETE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while deleting Occupation_type";
+                $response["message"] = "Oops! An error occurred while deleting exam";
             } else if ($res == NOT_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this Occupation_type is not exist";
+                $response["message"] = "Sorry, this exam is not exist";
             }
             // echo json response
             echoRespnse(201, $response);
@@ -163,19 +158,19 @@ $app->delete('/occupation_type_delete', 'authenticate', function() use ($app) {
 
 		
 /**
- * get one occupation_type
+ * get one exam
  * method GET
- * url /occupation_type/:projectName          
+ * url /exam/:examName          
  */
-$app->get('/occupation_type/:projectName', 'authenticate', function($occ_type_name) {
+$app->get('/exam/:examName', 'authenticate', function($clz_grade) {
             global $currunt_user_id;
             $response = array();
             
-			$occupationTypeManagement = new OccupationTypeManagement();
-			$res = $occupationTypeManagement->getOccupationTypeByProjectName($occ_type_name);
+			$examManagement = new ExamManagement();
+			$res = $examManagement->getExamByExamName($exm_name);
 
             $response["error"] = false;
-            $response["occupation_type"] = $res;
+            $response["exam"] = $res;
 
             
 
@@ -183,32 +178,30 @@ $app->get('/occupation_type/:projectName', 'authenticate', function($occ_type_na
         });
 
 /**
- * Listing all projects
+ * Listing all exams
  * method GET
- * url /occupation_type     
+ * url /exams        
  */
-$app->get('/occupation_types', 'authenticate', function() {
+$app->get('/classes', 'authenticate', function() {
             global $user_id;
 			
             $response = array();
 			
-            $occupationTypeManagement = new OccupationTypeManagement();
-			$res = $occupationTypeManagement->getAllProjects();
+            $classManagement = new ClassManagement();
+			$res = $classManagement->getAllClasses();
 
             $response["error"] = false;
-            $response["occupation_type"] = array();
+            $response["classes"] = array();
 
-            // looping through result and preparing projects array
-            while ($occ_type = $res->fetch_assoc()) {
+            // looping through result and preparing classes array
+            while ($classes = $res->fetch_assoc()) {
                 $tmp = array();
-				$tmp["occ_type_id"] = $occ_type["occ_type_id"];
-                $tmp["occ_type_name"] = $occ_type["occ_type_name"];
-                $tmp["occ_type_description"] = $occ_type["occ_type_description"];
-                $tmp["status"] = $occ_type["status"];
-                $tmp["recode_added_at"] = $occ_type["recode_added_at"];
-				$tmp["recode_added_by"] = $occ_type["recode_added_by"];
 				
-                array_push($response["occupation_type"], $tmp);
+                $tmp["clz_id"] = $classes["clz_id"];
+                $tmp["clz_grade"] = $classes["clz_grade"];
+                $tmp["clz_class"] = $classes["clz_class"];
+
+                array_push($response["classes"], $tmp);
             }
 
             echoRespnse(200, $response);
@@ -229,10 +222,6 @@ function verifyRequiredParams($required_fields) {
     $request_params = $_REQUEST;
     // Handling PUT request params
     if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
-        $app = \Slim\Slim::getInstance();
-        parse_str($app->request()->getBody(), $request_params);
-    }
-	if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
         $app = \Slim\Slim::getInstance();
         parse_str($app->request()->getBody(), $request_params);
     }

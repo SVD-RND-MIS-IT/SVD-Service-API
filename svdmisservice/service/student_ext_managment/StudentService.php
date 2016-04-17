@@ -1,6 +1,6 @@
 <?php
 require_once '../../model/user_management/OperationalUserManagement.php';
-require_once '../../model/students_class_managment/ClassManagement.php';
+require_once '../../model/student_ext_managment/StudentManagement.php';
 require '../.././config/libs/Slim/Slim.php';
 
 \Slim\Slim::registerAutoloader();
@@ -48,108 +48,95 @@ function authenticate(\Slim\Route $route) {
 }
 
 /*
- * ------------------------ CLASS TABLE METHODS ------------------------
+ * ------------------------ SCHOOL METHODS ------------------------
  */
  
 /**
- * Class Registration
- * url - /class_register
+ * School Registration
+ * url - /school_register
  * method - POST
- * params - clz_grade, clz_class
+ * params - sch_name, sch_situated_in
  */
-$app->post('/class_register',  function() use ($app) {
+$app->post('/student_register', function() use ($app) {
 	
             // check for required params
-            verifyRequiredParams(array('clz_grade', 'clz_class'));
+            verifyRequiredParams(array('stu_admission_number', 'stu_full_name' , 'stu_name_with_initisals', 'stu_gender', 'stu_date_of_birth'));
 			
 			global $currunt_user_id;
 
             $response = array();
 
             // reading post params
-            $clz_grade = $app->request->post('clz_grade');
-            $clz_class = $app->request->post('clz_class');
+            $stu_admission_number = $app->request->post('stu_admission_number');
+			$stu_full_name = $app->request->post('stu_full_name');
+			$stu_name_with_initisals = $app->request->post('stu_name_with_initisals');
+			$stu_gender = $app->request->post('stu_gender');
+			$stu_date_of_birth = $app->request->post('stu_date_of_birth');
+			$stu_land_phone_number = $app->request->post('stu_land_phone_number');
+			$stu_mobile_number = $app->request->post('stu_mobile_number');
+			$stu_address = $app->request->post('stu_address');
+			$stu_city = $app->request->post('stu_city');
+			$distance_to_home = $app->request->post('distance_to_home');
+			$father_id = $app->request->post('father_id');
+			$mother_id = $app->request->post('mother_id');
+			$guardian_id = $app->request->post('guardian_id');
+			$stu_email_address = $app->request->post('stu_email_address');
+			$stu_nic_number = $app->request->post('stu_nic_number');
            
-            $classManagement = new ClassManagement();
-			$res = $classManagement->createClass($clz_grade, $clz_class,1);
+            $studentManagement = new StudentManagement();
+			$res = $studentManagement->createStudent($stu_admission_number, $stu_full_name, $stu_name_with_initisals, $stu_gender, $stu_date_of_birth, $stu_land_phone_number, $stu_mobile_number, $stu_address, $stu_city, $distance_to_home, $father_id, $mother_id, $guardian_id, $stu_email_address, $stu_nic_number, 1);
 			
             if ($res == CREATED_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "Class is successfully registered";
+                $response["message"] = "Student is successfully registered";
             } else if ($res == CREATE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while registereing class";
+                $response["message"] = "Oops! An error occurred while registereing Student";
             } else if ($res == ALREADY_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this class already exist";
-            }
+                $response["message"] = "Sorry, this Student already exist";
+            }else{
+				$response["error"] = false;
+                $response["message"] = $res;
+			}
             // echo json response
             echoRespnse(201, $response);
         });
 
+
+
+
 /**
- * Exam Update
- * url - /exam_update/:examName
- * method - PUT
- * params - clz_grade, exm_discription
+ * Talants Delete
+ * url - /talants_delete
+ * method - DELETE
+ * params - tal_name
  */
-$app->put('/exam_update/:examName',  'authenticate', function($clz_grade) use ($app) {
+$app->delete('/talants_delete', 'authenticate', function() use ($app) {
 	
             // check for required params
-            verifyRequiredParams(array( 'exm_discription'));
+            verifyRequiredParams(array('tal_name'));
 			
 			global $currunt_user_id;
 
             $response = array();
 
-            // reading put params
-            $exm_discription = $app->request->put('exm_discription');
-
-            $examManagement = new ExamManagement();
-			$res = $examManagement->updateExam($exm_name, $exm_discription,$currunt_user_id);
+			// reading post params
+            $tal_name = $app->request->delete('tal_name');
 			
-            if ($res == UPDATE_SUCCESSFULLY) {
-                $response["error"] = false;
-                $response["message"] = "You are successfully updated exam";
-            } else if ($res == UPDATE_FAILED) {
+            $talantsManagement = new TalantsManagement();
+			$res = $talantsManagement->deleteTalant($tal_name, $currunt_user_id);
+			
+            if ($res == DELETE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while updating exam";
+                $response["message"] = "Oops! An error occurred while deleting talant";
             } else if ($res == NOT_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this exam is not exist";
-            }
-            // echo json response
-            echoRespnse(201, $response);
-        });
-
-
-/**
- * Exam Delete
- * url - /exam_delete
- * method - DELETE
- * params - exm_name/:examName
- */
-$app->delete('/exam_delete/:examName', 'authenticate', function($clz_grade) use ($app) {
-	
-            
-			global $currunt_user_id;
-
-            $response = array();
-
-			
-            $examManagement = new ExamManagement();
-			$res = $examManagement->deleteExam($exm_name, $currunt_user_id);
-			
-            if ($res == DELETE_SUCCESSFULLY) {
-                $response["error"] = false;
-                $response["message"] = "Exam is successfully deleted";
-            } else if ($res == DELETE_FAILED) {
-                $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while deleting exam";
-            } else if ($res == NOT_EXISTED) {
-                $response["error"] = true;
-                $response["message"] = "Sorry, this exam is not exist";
-            }
+                $response["message"] = "Sorry, this talant is not exist";
+            }else {
+				$response["error"] = false;
+				$response["message"] = $res;
+			}
             // echo json response
             echoRespnse(201, $response);
         });
@@ -157,19 +144,19 @@ $app->delete('/exam_delete/:examName', 'authenticate', function($clz_grade) use 
 
 		
 /**
- * get one exam
+ * get one talant
  * method GET
- * url /exam/:examName          
+ * url /talant/:talantsName       
  */
-$app->get('/exam/:examName', 'authenticate', function($clz_grade) {
-            global $currunt_user_id;
+$app->get('/student/:stu_admission_number',  function($stu_admission_number) {
+
             $response = array();
             
-			$examManagement = new ExamManagement();
-			$res = $examManagement->getExamByExamName($exm_name);
+			$studentManagement = new StudentManagement();
+			$res = $studentManagement->getStudentByStudentAdmissionNumber($stu_admission_number);
 
             $response["error"] = false;
-            $response["exam"] = $res;
+            $response["student"] = $res;
 
             
 
@@ -177,30 +164,31 @@ $app->get('/exam/:examName', 'authenticate', function($clz_grade) {
         });
 
 /**
- * Listing all exams
+ * Listing all talants
  * method GET
- * url /exams        
+ * url /talants        
  */
-$app->get('/classes',  function() {
-
+$app->get('/schools', 'authenticate', function() {
+            global $user_id;
 			
             $response = array();
 			
-            $classManagement = new ClassManagement();
-			$res = $classManagement->getAllClasses();
+            $schoolManagement = new SchoolManagement();
+			$res = $schoolManagement->getAllSchools();
 
             $response["error"] = false;
-            $response["classes"] = array();
+            $response["schools"] = array();
 
-            // looping through result and preparing classes array
-            while ($classes = $res->fetch_assoc()) {
+            // looping through result and preparing schools array
+            while ($schools = $res->fetch_assoc()) {
                 $tmp = array();
 				
-                $tmp["clz_id"] = $classes["clz_id"];
-                $tmp["clz_grade"] = $classes["clz_grade"];
-                $tmp["clz_class"] = $classes["clz_class"];
-
-                array_push($response["classes"], $tmp);
+                $tmp["sch_id"] = $schools["sch_id"];
+                $tmp["sch_name"] = $schools["sch_name"];
+                $tmp["sch_situated_in"] = $schools["sch_situated_in"];
+				$tmp["status"] = $schools["status"];
+				
+                array_push($response["schools"], $tmp);
             }
 
             echoRespnse(200, $response);
@@ -221,6 +209,11 @@ function verifyRequiredParams($required_fields) {
     $request_params = $_REQUEST;
     // Handling PUT request params
     if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
+        $app = \Slim\Slim::getInstance();
+        parse_str($app->request()->getBody(), $request_params);
+    }
+	// Handling PUT request params
+    if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
         $app = \Slim\Slim::getInstance();
         parse_str($app->request()->getBody(), $request_params);
     }

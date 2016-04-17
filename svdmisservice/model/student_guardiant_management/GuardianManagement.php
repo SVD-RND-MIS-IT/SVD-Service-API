@@ -7,7 +7,7 @@
  *
  */
 
-class OccupationTypeManagement {
+class GuardianManagement {
 
     private $conn;
 
@@ -32,32 +32,29 @@ class OccupationTypeManagement {
      *
      * @return database transaction status
      */
-    public function createOccupation_type($occ_type_name, $occ_type_description, $recode_added_by ) {
+    public function createGuardian($gur_name, $gur_phone_number, $gur_adress, $gur_email_address,$gur_occupation, $gur_occupation_type,$gur_office_address, $gur_office_phone_number,$gur_stu_addmision_number, $gur_old_student_number,$gur_other_interactions_with_dp, $gur_nic, $gur_tea_id, $recode_added_by ) {
 
 		
         $response = array();
 		
-        // First check if project already existed in db
-        if (!$this->isOccupation_typeExists($occ_type_name)) {
+
   
-            // insert query
-			 $stmt = $this->conn->prepare("INSERT INTO occupation_type(occ_type_name, occ_type_description, recode_added_by) values(?, ?, ?)");
-			 $stmt->bind_param("ssi", $occ_type_name, $occ_type_description, $recode_added_by );
-			 $result = $stmt->execute();
-
-			 $stmt->close();
-
-        } else {
-            // Project is not already existed in the db
-            return ALREADY_EXISTED;
-        }
-		
-         
+        // insert query
+		$stmt = $this->conn->prepare("INSERT INTO guardian(gur_name, gur_phone_number, gur_adress, gur_email_address, gur_occupation, gur_occupation_type, gur_office_address, gur_office_phone_number, gur_stu_addmision_number, gur_old_student_number, gur_other_interactions_with_dp, gur_nic, gur_tea_id, recode_added_by) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		$stmt->bind_param("sssssissssssii", $gur_name, $gur_phone_number, $gur_adress, $gur_email_address,$gur_occupation, $gur_occupation_type,$gur_office_address, $gur_office_phone_number,$gur_stu_addmision_number, $gur_old_student_number,$gur_other_interactions_with_dp, $gur_nic, $gur_tea_id, $recode_added_by );
+		$result = $stmt->execute();
 
         // Check for successful insertion
         if ($result) {
-			// project successfully inserted
-            return CREATED_SUCCESSFULLY;
+			$stmt = $this->conn->prepare("SELECT LAST_INSERT_ID();");
+			if ($stmt->execute()) {
+				$stmt->bind_result($LAST_INSERT_ID);
+				$stmt->fetch();
+				$stmt->close();
+				return $LAST_INSERT_ID;
+			} else {
+				return CREATE_FAILED;
+			}
         } else {
             // Failed to create project
             return CREATE_FAILED;

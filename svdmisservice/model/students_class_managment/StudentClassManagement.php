@@ -7,7 +7,7 @@
  *
  */
 
-class ClassManagement {
+class StudentClassManagement {
 
     private $conn;
 
@@ -32,17 +32,17 @@ class ClassManagement {
      *
      * @return database transaction status
      */
-    public function createClass($clz_grade, $clz_class,$recode_added_by ) {
+    public function createStudentClass($year, $stu_id, $clz_id, $recode_added_by ) {
 
 		
         $response = array();
 		
         // First check if class already existed in db
-        if (!$this->isClassExists($clz_grade,$clz_class)) {
+        if (!$this->isStudentClassExists($year, $stu_id)) {
   
             // insert query
-			 $stmt = $this->conn->prepare("INSERT INTO class(clz_grade, clz_class, recode_added_by) values(?, ?, ?)");
-			 $stmt->bind_param("isi", $clz_grade, $clz_class, $recode_added_by );
+			 $stmt = $this->conn->prepare("INSERT INTO student_class(year, stu_id, clz_id, recode_added_by) values(?, ?, ?, ?)");
+			 $stmt->bind_param("iiii", $year, $stu_id, $clz_id, $recode_added_by );
 			 $result = $stmt->execute();
 
 			 $stmt->close();
@@ -215,10 +215,10 @@ class ClassManagement {
      * @param String $clz_class class class to check in db
      * @return boolean
      */
-    private function isClassExists($clz_grade, $clz_class) {
+    private function isStudentClassExists($year, $stu_id) {
 		//$exm_name = "exm1";
-		$stmt = $this->conn->prepare("SELECT clz_grade from class WHERE status = 1 and clz_grade = ? and clz_class = ?  ");
-        $stmt->bind_param("is",$clz_grade, $clz_class);
+		$stmt = $this->conn->prepare("SELECT year from student_class WHERE (status = 1 or  status = 2) and year = ? and stu_id = ?  ");
+        $stmt->bind_param("ii",$year, $stu_id);
         $stmt->execute();
 		$stmt->store_result();
         $num_rows = $stmt->num_rows;

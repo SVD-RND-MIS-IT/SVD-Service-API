@@ -57,7 +57,7 @@ function authenticate(\Slim\Route $route) {
  * method - POST
  * params - sch_name, sch_situated_in
  */
-$app->post('/school_register',  'authenticate', function() use ($app) {
+$app->post('/school_register',  function() use ($app) {
 	
             // check for required params
             verifyRequiredParams(array('sch_name', 'sch_situated_in' ));
@@ -72,7 +72,7 @@ $app->post('/school_register',  'authenticate', function() use ($app) {
          
            
             $schoolManagement = new SchoolManagement();
-			$res = $schoolManagement->createSchool($sch_name, $sch_situated_in, $currunt_user_id);
+			$res = $schoolManagement->createSchool($sch_name, $sch_situated_in, 1);
 			
             if ($res == CREATED_SUCCESSFULLY) {
                 $response["error"] = false;
@@ -153,27 +153,27 @@ $app->get('/talant/:tal_name', 'authenticate', function($tal_name) {
  * method GET
  * url /talants        
  */
-$app->get('/talants', 'authenticate', function() {
+$app->get('/schools', function() {
             global $user_id;
 			
             $response = array();
 			
-            $talantsManagement = new TalantsManagement();
-			$res = $talantsManagement->getAllTalants();
+            $schoolManagement = new SchoolManagement();
+			$res = $schoolManagement->getAllSchools();
 
             $response["error"] = false;
-            $response["talants"] = array();
+            $response["schools"] = array();
 
-            // looping through result and preparing talants array
-            while ($talants = $res->fetch_assoc()) {
+            // looping through result and preparing schools array
+            while ($schools = $res->fetch_assoc()) {
                 $tmp = array();
 				
-                $tmp["tal_name"] = $talants["tal_name"];
-                $tmp["status"] = $talants["status"];
-                $tmp["recode_added_at"] = $talants["recode_added_at"];
-				$tmp["recode_added_by"] = $talants["recode_added_by"];
+                $tmp["sch_id"] = $schools["sch_id"];
+                $tmp["sch_name"] = $schools["sch_name"];
+                $tmp["sch_situated_in"] = $schools["sch_situated_in"];
+				$tmp["status"] = $schools["status"];
 				
-                array_push($response["talants"], $tmp);
+                array_push($response["schools"], $tmp);
             }
 
             echoRespnse(200, $response);

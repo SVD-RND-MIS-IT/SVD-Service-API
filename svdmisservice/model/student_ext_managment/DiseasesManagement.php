@@ -8,7 +8,7 @@ require_once '../../model/commen/PassHash.php';
  *
  */
 
-class SchoolManagement {
+class DiseasesManagement {
 
     private $conn;
 
@@ -143,8 +143,8 @@ class SchoolManagement {
 	 *
      * @return $talant object set of all talants
      */
-    public function getAllSchools() {
-        $stmt = $this->conn->prepare("SELECT * FROM school WHERE (status = 1 or  status = 2) ORDER BY sch_name");
+    public function getAllDiseases() {
+        $stmt = $this->conn->prepare("SELECT * FROM diseases WHERE (status = 1 or  status = 2) ORDER BY dis_name");
         $stmt->execute();
         $talants = $stmt->get_result();
         $stmt->close();

@@ -1,6 +1,6 @@
 <?php
 require_once '../../model/user_management/OperationalUserManagement.php';
-require_once '../../model/student_guardiant_management/OccupationTypeManagement.php';
+require_once '../../model/student_guardiant_management/SiblingsManagement.php';
 require '../.././config/libs/Slim/Slim.php';
 
 \Slim\Slim::registerAutoloader();
@@ -57,31 +57,31 @@ function authenticate(\Slim\Route $route) {
  * method - POST
  * params - occ_type_name, 	occ_type_description
  */
-$app->post('/occupation_type_register',  function() use ($app) {
+$app->post('/siblings_register',   function() use ($app) {
 	
             // check for required params
-            verifyRequiredParams(array('occ_type_name', 'occ_type_description' ));
+            verifyRequiredParams(array('stu_id', 'slib_id' ));
 			
 			global $currunt_user_id;
 
             $response = array();
 
             // reading post params
-            $occ_type_name = $app->request->post('occ_type_name');
-            $occ_type_description = $app->request->post('occ_type_description');
+            $stu_id = $app->request->post('stu_id');
+            $slib_id = $app->request->post('slib_id');
            
-            $occupationTypeManagement = new occupationTypeManagement();
-			$res = $occupationTypeManagement->createOccupation_type($occ_type_name, $occ_type_description, 1);
+            $siblingsManagement = new SiblingsManagement();
+			$res = $siblingsManagement->createSiblings($stu_id, $slib_id, 1);
 			
             if ($res == CREATED_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "Occupation type is successfully registered";
+                $response["message"] = "Sibling is successfully registered";
             } else if ($res == CREATE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while registereing occupation type";
+                $response["message"] = "Oops! An error occurred while registereing Sibling";
             } else if ($res == ALREADY_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this occupation type already exist";
+                $response["message"] = "Sorry, this Sibling  already exist";
             }
             // echo json response
             echoRespnse(201, $response);

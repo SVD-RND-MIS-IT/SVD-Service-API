@@ -1,6 +1,6 @@
 <?php
 require_once '../../model/user_management/OperationalUserManagement.php';
-require_once '../../model/student_guardiant_management/OccupationTypeManagement.php';
+require_once '../../model/student_ext_managment/StudentSchoolManagement.php';
 require '../.././config/libs/Slim/Slim.php';
 
 \Slim\Slim::registerAutoloader();
@@ -20,7 +20,7 @@ function authenticate(\Slim\Route $route) {
     $response = array();
     $app = \Slim\Slim::getInstance();
 
-   // Verifying Authorization Header
+    // Verifying Authorization Header
     if (isset($headers['Authorization'])) {
         $operationalUserManagement = new OperationalUserManagement();
 
@@ -48,113 +48,80 @@ function authenticate(\Slim\Route $route) {
 }
 
 /*
- * ------------------------ OCCUPATION TYPE TABLE METHODS ------------------------
+ * ------------------------ SCHOOL METHODS ------------------------
  */
  
 /**
- * Occupation_type Registration
- * url - /occupation_type_register
+ * School Registration
+ * url - /school_register
  * method - POST
- * params - occ_type_name, 	occ_type_description
+ * params - sch_name, sch_situated_in
  */
-$app->post('/occupation_type_register',  function() use ($app) {
+$app->post('/student_school_register',  function() use ($app) {
 	
             // check for required params
-            verifyRequiredParams(array('occ_type_name', 'occ_type_description' ));
+            verifyRequiredParams(array('stu_id', 'sch_id'));
 			
 			global $currunt_user_id;
 
             $response = array();
 
             // reading post params
-            $occ_type_name = $app->request->post('occ_type_name');
-            $occ_type_description = $app->request->post('occ_type_description');
+            $stu_id = $app->request->post('stu_id');
+			$sch_id = $app->request->post('sch_id');
+			$attend_year = $app->request->post('attend_year');
+         
            
-            $occupationTypeManagement = new occupationTypeManagement();
-			$res = $occupationTypeManagement->createOccupation_type($occ_type_name, $occ_type_description, 1);
+            $studentSchoolManagement = new StudentSchoolManagement();
+			$res = $studentSchoolManagement->createStudentSchool($stu_id, $sch_id, $attend_year, 1);
 			
             if ($res == CREATED_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "Occupation type is successfully registered";
+                $response["message"] = "student school is successfully registered";
             } else if ($res == CREATE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while registereing occupation type";
+                $response["message"] = "Oops! An error occurred while registereing student school";
             } else if ($res == ALREADY_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this occupation type already exist";
-            }
-            // echo json response
-            echoRespnse(201, $response);
-        });
-
-/**
- * Occupation_type Update
- * url - /occupation_type_updates
- * method - PUT
- * params - occ_type_name, occ_type_description
- */
-$app->put('/occupation_type_updates','authenticate', function() use ($app) {
-	
-             // check for required params
-            verifyRequiredParams(array('occ_type_name', 'occ_type_description' ));
-			
-			global $currunt_user_id;
-
-            $response = array();
-
-            // reading put params
-			$occ_type_name = $app->request->put('occ_type_name'); 
-            $occ_type_description = $app->request->put('occ_type_description'); 
-			
-            $occupationTypeManagement = new OccupationTypeManagement();
-			$res = $occupationTypeManagement->updateOccupation_type($occ_type_name, $occ_type_description, $currunt_user_id);
-			
-            if ($res == UPDATE_SUCCESSFULLY) {
-                $response["error"] = false;
-                $response["message"] = "Occupation type is Updated";
-            } else if ($res == UPDATE_FAILED) {
-                $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while updating occupation type ";
-            } else if ($res == NOT_EXISTED) {
-                $response["error"] = true;
-                $response["message"] = "Sorry,this occupation type not exist";
+                $response["message"] = "Sorry, this student school already exist";
             }
             // echo json response
             echoRespnse(201, $response);
         });
 
 
+
+
 /**
- * Occupation_type Delete
- * url - /occupation_type_delete
+ * Talants Delete
+ * url - /talants_delete
  * method - DELETE
- * params -occ_type_name
+ * params - tal_name
  */
-$app->delete('/occupation_type_delete', 'authenticate', function() use ($app) {
+$app->delete('/talants_delete', 'authenticate', function() use ($app) {
 	
             // check for required params
-            verifyRequiredParams(array('occ_type_name'));
+            verifyRequiredParams(array('tal_name'));
 			
 			global $currunt_user_id;
 
-			// reading put params
-			$occ_type_name = $app->request->delete('occ_type_name'); 
-			
             $response = array();
 
+			// reading post params
+            $tal_name = $app->request->delete('tal_name');
 			
-			$occupationTypeManagement = new OccupationTypeManagement();
-			$res = $occupationTypeManagement->deleteOccupationType($occ_type_name,$currunt_user_id);
+            $talantsManagement = new TalantsManagement();
+			$res = $talantsManagement->deleteTalant($tal_name, $currunt_user_id);
 			
             if ($res == DELETE_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "Occupation_type is successfully deleted";
+                $response["message"] = "Talant is successfully deleted";
             } else if ($res == DELETE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while deleting Occupation_type";
+                $response["message"] = "Oops! An error occurred while deleting talant";
             } else if ($res == NOT_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this Occupation_type is not exist";
+                $response["message"] = "Sorry, this talant is not exist";
             }
             // echo json response
             echoRespnse(201, $response);
@@ -163,19 +130,19 @@ $app->delete('/occupation_type_delete', 'authenticate', function() use ($app) {
 
 		
 /**
- * get one occupation_type
+ * get one talant
  * method GET
- * url /occupation_type/:projectName          
+ * url /talant/:talantsName       
  */
-$app->get('/occupation_type/:projectName', 'authenticate', function($occ_type_name) {
+$app->get('/talant/:tal_name', 'authenticate', function($tal_name) {
             global $currunt_user_id;
             $response = array();
             
-			$occupationTypeManagement = new OccupationTypeManagement();
-			$res = $occupationTypeManagement->getOccupationTypeByProjectName($occ_type_name);
+			$talantsManagement = new TalantsManagement();
+			$res = $talantsManagement->getTalantByTalantName($tal_name);
 
             $response["error"] = false;
-            $response["occupation_type"] = $res;
+            $response["talant"] = $res;
 
             
 
@@ -183,32 +150,31 @@ $app->get('/occupation_type/:projectName', 'authenticate', function($occ_type_na
         });
 
 /**
- * Listing all projects
+ * Listing all talants
  * method GET
- * url /occupation_type     
+ * url /talants        
  */
-$app->get('/occupation_types', 'authenticate', function() {
+$app->get('/schools', 'authenticate', function() {
             global $user_id;
 			
             $response = array();
 			
-            $occupationTypeManagement = new OccupationTypeManagement();
-			$res = $occupationTypeManagement->getAllProjects();
+            $schoolManagement = new SchoolManagement();
+			$res = $schoolManagement->getAllSchools();
 
             $response["error"] = false;
-            $response["occupation_type"] = array();
+            $response["schools"] = array();
 
-            // looping through result and preparing projects array
-            while ($occ_type = $res->fetch_assoc()) {
+            // looping through result and preparing schools array
+            while ($schools = $res->fetch_assoc()) {
                 $tmp = array();
-				$tmp["occ_type_id"] = $occ_type["occ_type_id"];
-                $tmp["occ_type_name"] = $occ_type["occ_type_name"];
-                $tmp["occ_type_description"] = $occ_type["occ_type_description"];
-                $tmp["status"] = $occ_type["status"];
-                $tmp["recode_added_at"] = $occ_type["recode_added_at"];
-				$tmp["recode_added_by"] = $occ_type["recode_added_by"];
 				
-                array_push($response["occupation_type"], $tmp);
+                $tmp["sch_id"] = $schools["sch_id"];
+                $tmp["sch_name"] = $schools["sch_name"];
+                $tmp["sch_situated_in"] = $schools["sch_situated_in"];
+				$tmp["status"] = $schools["status"];
+				
+                array_push($response["schools"], $tmp);
             }
 
             echoRespnse(200, $response);
@@ -232,7 +198,8 @@ function verifyRequiredParams($required_fields) {
         $app = \Slim\Slim::getInstance();
         parse_str($app->request()->getBody(), $request_params);
     }
-	if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+	// Handling PUT request params
+    if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
         $app = \Slim\Slim::getInstance();
         parse_str($app->request()->getBody(), $request_params);
     }

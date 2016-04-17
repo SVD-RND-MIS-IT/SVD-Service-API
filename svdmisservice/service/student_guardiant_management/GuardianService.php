@@ -1,6 +1,6 @@
 <?php
 require_once '../../model/user_management/OperationalUserManagement.php';
-require_once '../../model/student_guardiant_management/OccupationTypeManagement.php';
+require_once '../../model/student_guardiant_management/GuardianManagement.php';
 require '../.././config/libs/Slim/Slim.php';
 
 \Slim\Slim::registerAutoloader();
@@ -57,32 +57,46 @@ function authenticate(\Slim\Route $route) {
  * method - POST
  * params - occ_type_name, 	occ_type_description
  */
-$app->post('/occupation_type_register',  function() use ($app) {
+$app->post('/guardian_register',   function() use ($app) {
 	
             // check for required params
-            verifyRequiredParams(array('occ_type_name', 'occ_type_description' ));
+            verifyRequiredParams(array('gur_name' ));
 			
 			global $currunt_user_id;
 
             $response = array();
 
             // reading post params
-            $occ_type_name = $app->request->post('occ_type_name');
-            $occ_type_description = $app->request->post('occ_type_description');
+            $gur_name = $app->request->post('gur_name');
+            $gur_phone_number = $app->request->post('gur_phone_number');
+            $gur_adress = $app->request->post('gur_adress');
+			$gur_email_address = $app->request->post('gur_email_address');
+            $gur_occupation = $app->request->post('gur_occupation');
+			$gur_occupation_type = $app->request->post('gur_occupation_type');
+            $gur_office_address = $app->request->post('gur_office_address');
+			$gur_office_phone_number = $app->request->post('gur_office_phone_number');
+            $gur_stu_addmision_number = $app->request->post('gur_stu_addmision_number');
+			$gur_old_student_number = $app->request->post('gur_old_student_number');
+            $gur_other_interactions_with_dp = $app->request->post('gur_other_interactions_with_dp');
+			$gur_nic = $app->request->post('gur_nic');
+            $gur_tea_id = $app->request->post('gur_tea_id');
            
-            $occupationTypeManagement = new occupationTypeManagement();
-			$res = $occupationTypeManagement->createOccupation_type($occ_type_name, $occ_type_description, 1);
+            $guardianManagement = new GuardianManagement();
+			$res = $guardianManagement->createGuardian($gur_name, $gur_phone_number,$gur_adress, $gur_email_address,$gur_occupation, $gur_occupation_type,$gur_office_address, $gur_office_phone_number,$gur_stu_addmision_number, $gur_old_student_number,$gur_other_interactions_with_dp, $gur_nic, $gur_tea_id,1);
 			
             if ($res == CREATED_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "Occupation type is successfully registered";
+                $response["message"] = "gardian is successfully registered";
             } else if ($res == CREATE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while registereing occupation type";
+                $response["message"] = "Oops! An error occurred while registereing gardian";
             } else if ($res == ALREADY_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this occupation type already exist";
-            }
+                $response["message"] = "Sorry, this gardian  already exist";
+            }else{
+				$response["error"] = false;
+                $response["message"] = $res;
+			}
             // echo json response
             echoRespnse(201, $response);
         });

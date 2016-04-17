@@ -107,7 +107,7 @@ $app->post('/login', function() use ($app) {
  * method - POST
  * params - usr_name, usr_pwd, usr_full_name, usr_email, usr_phone_number, usr_category
  */
-$app->post('/operational_user_register',  'authenticate', function() use ($app) {
+$app->post('/operational_user_register', function() use ($app) {
 	
 			require_once '../../model/commen/Validations.php';
             // check for required params
@@ -131,7 +131,7 @@ $app->post('/operational_user_register',  'authenticate', function() use ($app) 
             $validations->validateEmail($usr_email);
 
             $operationalUserManagement = new OperationalUserManagement();
-			$res = $operationalUserManagement->createOperationalUser($usr_name, $usr_pwd, $usr_full_name,$usr_email, $usr_phone_number, $usr_category,$currunt_user_id);
+			$res = $operationalUserManagement->createOperationalUser($usr_name, $usr_pwd, $usr_full_name,$usr_email, $usr_phone_number, $usr_category,1);
 			
             if ($res == USER_CREATED_SUCCESSFULLY) {
                 $response["error"] = false;

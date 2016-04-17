@@ -1,5 +1,4 @@
 <?php
-require_once '../../model/user_management/UserCategoryManagement.php';
 require_once '../../model/user_management/OperationalUserManagement.php';
 require '../.././config/libs/Slim/Slim.php';
 
@@ -50,44 +49,99 @@ function authenticate(\Slim\Route $route) {
 /**
  * ----------- METHODS WITHOUT AUTHENTICATION ---------------------------------
  */
- 
- //still no methods found
+/**
+ * User Login
+ * url - /login
+ * method - POST
+ * params - usr_name, usr_pwd
+ */
+$app->post('/login', function() use ($app) {
+            // check for required params
+            verifyRequiredParams(array('usr_name', 'usr_pwd'));
+
+            // reading post params
+            $usr_name = $app->request()->post('usr_name');
+            $usr_pwd = $app->request()->post('usr_pwd');
+            $response = array();
+
+            $operationalUserManagement = new OperationalUserManagement();
+            // check for correct usr_name and usr_pwd
+            if ($operationalUserManagement->checkLogin($usr_name, $usr_pwd)) {
+                // get the user by usr_name
+                $user = $operationalUserManagement->getUserByUserName($usr_name);
+
+                if ($user != NULL) {
+                    $response["error"] = false;
+					
+                    $response['usr_name'] = $user['usr_name'];
+                    $response['usr_full_name'] = $user['usr_full_name'];
+					$response['usr_email'] = $user['usr_email'];
+                    $response['usr_phone_number'] = $user['usr_phone_number'];
+					$response['usr_name'] = $user['usr_name'];
+                    $response['usr_api_key'] = $user['usr_api_key'];
+					$response['usr_name'] = $user['usr_name'];
+                    $response['ou_recode_added_at'] = $user['ou_recode_added_at'];
+					$response['ucat_name'] = $user['ucat_name'];
+                    $response['ucat_description'] = $user['ucat_description'];
+                   
+                } else {
+                    // unknown error occurred
+                    $response['error'] = true;
+                    $response['message'] = "An error occurred. Please try again";
+                }
+            } else {
+                // user credentials are wrong
+                $response['error'] = true;
+                $response['message'] = 'Login failed. Incorrect credentials';
+            }
+
+            echoRespnse(200, $response);
+        });
 
 /*
  * ------------------------ METHODS WITH AUTHENTICATION ------------------------
  */
 /**
- * Operational User Type Registration
- * url - /user_category_register
+ * Operational User Registration
+ * url - /operational_user_register
  * method - POST
- * params - ucat_name, ucat_description
+ * params - usr_name, usr_pwd, usr_full_name, usr_email, usr_phone_number, usr_category
  */
-$app->post('/user_category_register', function() use ($app) {
-
+$app->post('/operational_user_register',  'authenticate', function() use ($app) {
+	
+			require_once '../../model/commen/Validations.php';
             // check for required params
-            verifyRequiredParams(array('ucat_name', 'ucat_description'));
+            verifyRequiredParams(array('usr_name', 'usr_pwd', 'usr_full_name','usr_email', 'usr_category'));
 			
 			global $currunt_user_id;
 
             $response = array();
 
             // reading post params
-            $ucat_name = $app->request->post('ucat_name');
-            $ucat_description = $app->request->post('ucat_description');
+            $usr_name = $app->request->post('usr_name');
+            $usr_pwd = $app->request->post('usr_pwd');
+            $usr_full_name = $app->request->post('usr_full_name');
+			$usr_email = $app->request->post('usr_email');
+            $usr_phone_number = $app->request->post('usr_phone_number');
+			$usr_category = $app->request->post('usr_category');
 			
+			$validations = new Validations();
 
-            $userCategoryManagement = new UserCategoryManagement();
-			$res = $userCategoryManagement->createUserCategory($ucat_name, $ucat_description,1);
+            // validating email address
+            $validations->validateEmail($usr_email);
+
+            $operationalUserManagement = new OperationalUserManagement();
+			$res = $operationalUserManagement->createOperationalUser($usr_name, $usr_pwd, $usr_full_name,$usr_email, $usr_phone_number, $usr_category,$currunt_user_id);
 			
-            if ($res == USER_CATEGORY_CREATED_SUCCESSFULLY) {
+            if ($res == USER_CREATED_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "User category successfully registered";
-            } else if ($res == USER_CATEGORY_CREATE_FAILED) {
+                $response["message"] = "You are successfully registered";
+            } else if ($res == USER_CREATE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while registereing user category ";
-            } else if ($res == USER_CATEGORY_ALREADY_EXISTED) {
+                $response["message"] = "Oops! An error occurred while registereing user";
+            } else if ($res == USER_ALREADY_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this user category  already exist";
+                $response["message"] = "Sorry, this user name already exist";
             }
             // echo json response
             echoRespnse(201, $response);
@@ -101,7 +155,7 @@ $app->post('/user_category_register', function() use ($app) {
  */
 $app->put('/operational_user_update/:userName',  'authenticate', function($usr_name) use ($app) {
 	
-			require_once '../model/commen/Validations.php';
+			require_once '../../model/commen/Validations.php';
             // check for required params
             verifyRequiredParams(array( 'usr_pwd', 'usr_full_name','usr_email', 'usr_phone_number', 'usr_category'));
 			
@@ -171,11 +225,12 @@ $app->delete('/operational_user_delete/:userName', 'authenticate', function($usr
             echoRespnse(201, $response);
         });
 
+
 		
 /**
- * Listing all tasks of particual user
+ * get one user
  * method GET
- * url /tasks          
+ * url /operational_user/:userName          
  */
 $app->get('/operational_user/:userName', 'authenticate', function($usr_name) {
             global $currunt_user_id;
@@ -193,37 +248,39 @@ $app->get('/operational_user/:userName', 'authenticate', function($usr_name) {
         });
 
 /**
- * Listing all tasks of particual user
+ * Listing all users
  * method GET
- * url /tasks          
+ * url /operational_users        
  */
-$app->get('/user_categories', function() {
+$app->get('/operational_users', 'authenticate', function() {
             global $user_id;
 			
             $response = array();
 			
-            $userCategoryManagement = new UserCategoryManagement();
+            $operationalUserManagement = new OperationalUserManagement();
 
             // fetching all users
-            $result = $userCategoryManagement->getAllUserCategory();
+            $result = $operationalUserManagement->getAllUsers();
 
             $response["error"] = false;
-            $response["user_category"] = array();
+            $response["user"] = array();
 
             // looping through result and preparing tasks array
-            while ($user_category = $result->fetch_assoc()) {
+            while ($user = $result->fetch_assoc()) {
                 $tmp = array();
 				
-                $tmp["ucat_id"] = $user_category["ucat_id"];
-                $tmp["ucat_name"] = $user_category["ucat_name"];
-                $tmp["ucat_description"] = $user_category["ucat_description"];
-                $tmp["status"] = $user_category["status"];
-				$tmp["recode_added_at"] = $user_category["recode_added_at"];
-                $tmp["recode_added_by"] = $user_category["recode_added_by"];
-
+                $tmp["usr_name"] = $user["usr_name"];
+                $tmp["usr_full_name"] = $user["usr_full_name"];
+                $tmp["usr_email"] = $user["usr_email"];
+                $tmp["usr_phone_number"] = $user["usr_phone_number"];
+				$tmp["usr_api_key"] = $user["usr_api_key"];
+                $tmp["ou_status"] = $user["ou_status"];
+                $tmp["ou_recode_added_at"] = $user["ou_recode_added_at"];
+                $tmp["ucat_name"] = $user["ucat_name"];
+				 $tmp["ucat_description"] = $user["ucat_description"];
 				
 				
-                array_push($response["user_category"], $tmp);
+                array_push($response["user"], $tmp);
             }
 
             echoRespnse(200, $response);
