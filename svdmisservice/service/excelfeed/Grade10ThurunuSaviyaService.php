@@ -1,6 +1,6 @@
 <?php
 require_once '../../model/user_management/OperationalUserManagement.php';
-require_once '../../model/thurunu_saviya_managment/ProjectManagement.php';
+require_once '../../model/excelfeed/Grade10ThurunuSaviyaManagement.php';
 require '../.././config/libs/Slim/Slim.php';
 
 \Slim\Slim::registerAutoloader();
@@ -57,37 +57,58 @@ function authenticate(\Slim\Route $route) {
  * method - POST
  * params - pro_name, pro_discription, pro_PDF_path, pro_supervisor_id
  */
-$app->post('/project_register',   function() use ($app) {
+$app->post('/grade_10_thurunu_saviya_register',   function() use ($app) {
 	
             // check for required params
-            verifyRequiredParams(array('pro_name', 'pro_year', 'pro_group_num' ));
+            verifyRequiredParams(array('stu_admission_number', 'year', 'ts10_group' ));
 			
 			global $currunt_user_id;
 
             $response = array();
 
             // reading post params
-            $pro_name = $app->request->post('pro_name');
-            $pro_discription = $app->request->post('pro_discription');
-			$pro_PDF_path = $app->request->post('pro_PDF_path');
-			$pro_supervisor_id = $app->request->post('pro_supervisor_id');
-			$pro_year = $app->request->post('pro_year');
-			$pro_group_num = $app->request->post('pro_group_num');
-			$pro_catogory = $app->request->post('pro_catogory');
+            $stu_admission_number = $app->request->post('stu_admission_number');
+            $year = $app->request->post('year');
+			$ts10_group = $app->request->post('ts10_group');
+			$ts10_daily_attendance = $app->request->post('ts10_daily_attendance');
+			$ts10_poya_attendance = $app->request->post('ts10_poya_attendance');
+			$ts10_recomendation = $app->request->post('ts10_recomendation');
+			$ts10_evaluation_cri_1 = $app->request->post('ts10_evaluation_cri_1');
+			$ts10_evaluation_cri_2 = $app->request->post('ts10_evaluation_cri_2');
+			$ts10_evaluation_cri_3 = $app->request->post('ts10_evaluation_cri_3');
+			$ts10_evaluation_cri_4 = $app->request->post('ts10_evaluation_cri_4');
+			$ts10_evaluation_cri_5 = $app->request->post('ts10_evaluation_cri_5');
+			$ts10_evaluation_cri_6 = $app->request->post('ts10_evaluation_cri_6');
+			$ts10_evaluation_cri_7 = $app->request->post('ts10_evaluation_cri_7');
+			$ts10_evaluation_cri_8 = $app->request->post('ts10_evaluation_cri_8');
+			$ts10_evaluation_cri_9 = $app->request->post('ts10_evaluation_cri_9');
+			$ts10_evaluation_cri_10 = $app->request->post('ts10_evaluation_cri_10');
+			$ts10_evaluation_cri_11 = $app->request->post('ts10_evaluation_cri_11');
+			$ts10_evaluation_cri_12 = $app->request->post('ts10_evaluation_cri_12');
+			$ts10_evaluation_cri_13 = $app->request->post('ts10_evaluation_cri_13');
+			$ts10_evaluation_cri_14 = $app->request->post('ts10_evaluation_cri_14');
+			$ts10_evaluation_cri_15 = $app->request->post('ts10_evaluation_cri_15');
+			$ts10_evaluation_cri_16 = $app->request->post('ts10_evaluation_cri_16');
+			$ts10_evaluation_cri_17 = $app->request->post('ts10_evaluation_cri_17');
+			$ts10_evaluation_cri_18 = $app->request->post('ts10_evaluation_cri_18');
+			$ts10_evaluation_cri_19 = $app->request->post('ts10_evaluation_cri_19');
+			$ts10_evaluation_cri_20 = $app->request->post('ts10_evaluation_cri_20');
+			$ts10_evaluation_cri_21 = $app->request->post('ts10_evaluation_cri_21');
+			$ts10_evaluation_cri_22 = $app->request->post('ts10_evaluation_cri_22');
+			$ts10_evaluation_cri_23 = $app->request->post('ts10_evaluation_cri_23');
+			$ts10_evaluation_cri_24 = $app->request->post('ts10_evaluation_cri_24');
+			$ts10_evaluation_cri_25 = $app->request->post('ts10_evaluation_cri_25');
+			$ts10_evaluation_cri_26 = $app->request->post('ts10_evaluation_cri_26');
+			$ts10_evaluation_cri_27 = $app->request->post('ts10_evaluation_cri_27');
+			$ts10_evaluation_cri_28 = $app->request->post('ts10_evaluation_cri_28');
+			$ts10_evaluation_cri_29 = $app->request->post('ts10_evaluation_cri_29');
+			$ts10_evaluation_cri_30 = $app->request->post('ts10_evaluation_cri_30');
            
-            $projectManagement = new ProjectManagement();
-			$res = $projectManagement->createProject($pro_name, $pro_discription, $pro_year, $pro_group_num, $pro_catogory, $pro_PDF_path, $pro_supervisor_id, 1);
+            $grade10ThurunuSaviyaManagement = new Grade10ThurunuSaviyaManagement();
+			$res = $grade10ThurunuSaviyaManagement->createGrade10ThurunuSaviya($stu_admission_number, $year, $ts10_group, $ts10_daily_attendance, $ts10_poya_attendance, $ts10_recomendation, $ts10_evaluation_cri_1, $ts10_evaluation_cri_2, $ts10_evaluation_cri_3, $ts10_evaluation_cri_4, $ts10_evaluation_cri_5, $ts10_evaluation_cri_6, $ts10_evaluation_cri_7, $ts10_evaluation_cri_8, $ts10_evaluation_cri_9, $ts10_evaluation_cri_10, $ts10_evaluation_cri_11, $ts10_evaluation_cri_12, $ts10_evaluation_cri_13, $ts10_evaluation_cri_14, $ts10_evaluation_cri_15, $ts10_evaluation_cri_16, $ts10_evaluation_cri_17, $ts10_evaluation_cri_18, $ts10_evaluation_cri_19, $ts10_evaluation_cri_20, $ts10_evaluation_cri_21, $ts10_evaluation_cri_22, $ts10_evaluation_cri_23, $ts10_evaluation_cri_24, $ts10_evaluation_cri_25, $ts10_evaluation_cri_26, $ts10_evaluation_cri_27, $ts10_evaluation_cri_28, $ts10_evaluation_cri_29, $ts10_evaluation_cri_30, 1);
 			
-            if ($res == CREATED_SUCCESSFULLY) {
-                $response["error"] = false;
-                $response["message"] = "Project is successfully registered";
-            } else if ($res == CREATE_FAILED) {
-                $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while registereing project";
-            } else if ($res == ALREADY_EXISTED) {
-                $response["error"] = true;
-                $response["message"] = "Sorry, this project already exist";
-            }
+            $response["error"] = false;
+            $response["exam_result_state"] = $res;
             // echo json response
             echoRespnse(201, $response);
         });

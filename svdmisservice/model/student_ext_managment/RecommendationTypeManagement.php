@@ -8,7 +8,7 @@ require_once '../../model/commen/PassHash.php';
  *
  */
 
-class StudentManagement {
+class RecommendationTypeManagement {
 
     private $conn;
 
@@ -164,45 +164,6 @@ class StudentManagement {
             return NULL;
         }
     }
-	
-	
-	/**
-     * Fetching talants by tal_name
-	 *
-     * @param String $tal_name tal name
-	 *
-	 *@return talant object only needed data
-     */
-    public function getStudentByStudentFullName($stu_full_name) {
-        $stmt = $this->conn->prepare("call search_student_byName(?)");
-        $stmt->bind_param("s", $stu_full_name);
-		$stmt->execute();
-        $student = $stmt->get_result();
-        $stmt->close();
-        return $student;
-       /* if ($stmt->execute()) {
-            $stmt->bind_result($stu_id, $stu_admission_number, $stu_full_name, $stu_name_with_initisals, $name1, $name2, $name3, $stu_gender, 
-			 $stu_address, $stu_city);
-            $stmt->fetch();
-            $student = array();
-            $student["stu_id"] = $stu_id;
-            $student["stu_admission_number"] = $stu_admission_number;
-            $student["stu_full_name"] = $stu_full_name;
-			$student["stu_name_with_initisals"] = $stu_name_with_initisals;
-			$student["name1"] = $name1;
-            $student["name2"] = $name2;
-			$student["name3"] = $name3;
-			$student["stu_gender"] = $stu_gender;
-			$student["stu_date_of_birth"] = $stu_date_of_birth;
-			$student["stu_address"] = $stu_address;
-			$student["stu_city"] = $stu_city;
-
-            $stmt->close();
-            return $student;
-        } else {
-            return NULL;
-        }*/
-    }
   
   
 	/**
@@ -210,8 +171,8 @@ class StudentManagement {
 	 *
      * @return $talant object set of all talants
      */
-    public function getAllSchools() {
-        $stmt = $this->conn->prepare("SELECT * FROM school WHERE (status = 1 or  status = 2) ORDER BY sch_name");
+    public function getAllRecommendationTypes() {
+        $stmt = $this->conn->prepare("SELECT * FROM recommendation_type WHERE (status = 1 or  status = 2) ORDER BY rec_type_name");
         $stmt->execute();
         $talants = $stmt->get_result();
         $stmt->close();

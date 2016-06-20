@@ -8,7 +8,7 @@ require_once '../../model/commen/PassHash.php';
  *
  */
 
-class ExamManagement {
+class ExamResultManagement {
 
     private $conn;
 
@@ -33,39 +33,41 @@ class ExamManagement {
      *
      * @return database transaction status
      */
-    public function createExam($exm_name, $exm_discription,$recode_added_by ) {
+    public function createResult($stu_id, $exm_id, $year, $result1, $stu_exm_index_number, $recode_added_by ) {
 
 		
         $response = array();
 		
-        // First check if exam already existed in db
-        if (!$this->isExamExists($exm_name)) {
   
             // insert query
-			 $stmt = $this->conn->prepare("INSERT INTO exam(exm_name, exm_discription, recode_added_by) values(?, ?, ?)");
-			 $stmt->bind_param("ssi", $exm_name, $exm_discription, $recode_added_by );
-			 $result = $stmt->execute();
-
-			 $stmt->close();
-
+		$stmt = $this->conn->prepare("call inser_exam_results(?, ?, ?, ?, ?, ?)");
+		$stmt->bind_param("siissi", $stu_id, $exm_id, $year, $result1, $stu_exm_index_number, $recode_added_by );
+		if ($stmt->execute()) {
+            $stmt->bind_result($resultset);
+            $stmt->fetch();
+            $exam_result_state = $resultset;
+            $stmt->close();
+            return $exam_result_state;
         } else {
-            // Exam is not already existed in the db
-            return ALREADY_EXISTED;
+            return NULL;
         }
 		
-         
+		
+		$result = $stmt->execute();
 
+		$stmt->close();
+
+        
         // Check for successful insertion
         if ($result) {
-			// exam successfully inserted
+			// project successfully inserted
             return CREATED_SUCCESSFULLY;
         } else {
-            // Failed to create exam
+            // Failed to create project
             return CREATE_FAILED;
         }
         
 		return $response;
-
     }
 	
 	/**
@@ -215,9 +217,9 @@ class ExamManagement {
      *
      * @return boolean
      */
-    private function isExamExists($exm_name) {
-		$stmt = $this->conn->prepare("SELECT exm_name from exam WHERE status = 1 and exm_name = ?  ");
-        $stmt->bind_param("s",$exm_name);
+    private function isResultExists($stu_id, $exm_id, $year) {
+		$stmt = $this->conn->prepare("SELECT result from result WHERE (status = 1 or  status = 2) and stu_id = ? and exm_id = ? and year = ? ");
+        $stmt->bind_param("iii",$stu_id, $exm_id, $year);
         $stmt->execute();
 		$stmt->store_result();
         $num_rows = $stmt->num_rows;

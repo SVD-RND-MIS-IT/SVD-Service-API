@@ -1,13 +1,14 @@
 <?php
+require_once '../../model/commen/PassHash.php';
 /**
  * Class to handle all the exam details
  * This class will have CRUD methods for exam
  *
- * @author Randi Kodikara
+ * @author Hasitha Lakmal
  *
  */
 
-class StudentClassManagement {
+class ResultManagement {
 
     private $conn;
 
@@ -20,35 +21,35 @@ class StudentClassManagement {
 	
 	
 /*
- * ------------------------ CLASS TABLE METHODS ------------------------
+ * ------------------------ EXAM TABLE METHODS ------------------------
  */
 
     /**
-     * Creating new class
+     * Creating new exam
      *
-     * @param Int $clz_grade Class grade for the system
-     * @param String $clz_class Discription of the Class
+     * @param String $exm_name Exam name for the system
+     * @param String $exm_discription Discription of the Exam
 	 * @param String $recode_added_by 
      *
      * @return database transaction status
      */
-    public function createStudentClass($year, $stu_id, $clz_id, $recode_added_by ) {
+    public function createResult($stu_id, $exm_id, $year, $result, $stu_exm_index_number ) {
 
 		
         $response = array();
 		
-        // First check if class already existed in db
-        if (!$this->isStudentClassExists($year, $stu_id)) {
+        // First check if exam already existed in db
+        if (!$this->isResultExists($stu_id, $exm_id, $year)) {
   
             // insert query
-			 $stmt = $this->conn->prepare("INSERT INTO student_class(year, stu_id, clz_id, recode_added_by) values(?, ?, ?, ?)");
-			 $stmt->bind_param("iiii", $year, $stu_id, $clz_id, $recode_added_by );
+			 $stmt = $this->conn->prepare("INSERT INTO result(stu_id, exm_id, year, result, stu_exm_index_number, recode_added_by) values(?, ?, ?, ?, ?, ?)");
+			 $stmt->bind_param("iiissi", $stu_id, $exm_id, $year, $result, $stu_exm_index_number, $recode_added_by );
 			 $result = $stmt->execute();
 
 			 $stmt->close();
 
         } else {
-            // Class is not already existed in the db
+            // Exam is not already existed in the db
             return ALREADY_EXISTED;
         }
 		
@@ -56,10 +57,10 @@ class StudentClassManagement {
 
         // Check for successful insertion
         if ($result) {
-			// class successfully inserted
+			// exam successfully inserted
             return CREATED_SUCCESSFULLY;
         } else {
-            // Failed to create class
+            // Failed to create exam
             return CREATE_FAILED;
         }
         
@@ -67,81 +68,36 @@ class StudentClassManagement {
 
     }
 	
-	
 	/**
-     * Creating new class
+     * Update exam
      *
-     * @param Int $clz_grade Class grade for the system
-     * @param String $clz_class Discription of the Class
+     * @param String $exm_name Exam name for the system
+     * @param String $exm_discription Discription of the Exam
 	 * @param String $recode_added_by 
      *
      * @return database transaction status
      */
-    public function createStudentClass_byAdm($year, $stu_adm, $clz_id, $recode_added_by ) {
+    public function updateExam($exm_name, $exm_discription,$recode_added_by) {
 
 		
         $response = array();
-		
-        // First check if class already existed in db
-        if (!$this->isStudentClassExists($year, $stu_adm)) {
-  			 
-			 // insert query
-			 $stmt = $this->conn->prepare("call add_student_classes (?, ?, ?, ?)");
-			 $stmt->bind_param("siii",  $stu_adm, $year, $clz_id, $recode_added_by );
-			 $result = $stmt->execute();
-			 
-
-			 $stmt->close();
-
-        } else {
-            // Class is not already existed in the db
-            return ALREADY_EXISTED;
-        }
-		
-         
-
-        // Check for successful insertion
-        if ($result) {
-			// class successfully inserted
-            return CREATED_SUCCESSFULLY;
-        } else {
-            // Failed to create class
-            return CREATE_FAILED;
-        }
-        
-		return $response;
-
-    }
-	/**
-     * Update class
-     *
-     * @param Int $clz_grade Class name for the system
-     * @param String $clz_class Discription of the Class
-	 * @param String $recode_added_by 
-     *
-     * @return database transaction status
-     */
-    public function updateClass($clz_grade, $clz_class,$recode_added_by) {
-
-		
-        $response = array();
-        // First check if class already existed in db
-        if ($this->isClassExists($clz_grade)) {
+        // First check if exam already existed in db
+        if ($this->isExamExists($exm_name)) {
             
 			//
-			$stmt = $this->conn->prepare("UPDATE class set status = 2,  recode_modified_at = now() , recode_modified_by = ? where clz_grade = ? and status = 1");
-			$stmt->bind_param("is", $recode_added_by, $clz_grade);
+			$stmt = $this->conn->prepare("UPDATE exam set status = 2,  recode_modified_at = now() , recode_modified_by = ? where exm_name = ? and status = 1");
+			$stmt->bind_param("is", $recode_added_by, $exm_name);
 			$result = $stmt->execute();
 			
             // insert updated recode
-			$stmt = $this->conn->prepare("INSERT INTO class(clz_grade, clz_class, recode_added_by) values(?, ?, ?)");
-			$stmt->bind_param("isi", $clz_grade, $clz_class, $recode_added_by );
+			$stmt = $this->conn->prepare("INSERT INTO exam(exm_name, exm_discription, recode_added_by) values(?, ?, ?)");
+			$stmt->bind_param("ssi", $exm_name, $exm_discription, $recode_added_by );
 			$result = $stmt->execute();
 
 			$stmt->close();
 
         } else {
-            // class is not already existed in the db
+            // exam is not already existed in the db
             return NOT_EXISTED;
         }
 		
@@ -149,10 +105,10 @@ class StudentClassManagement {
 
         // Check for successful update
         if ($result) {
-			// class successfully update
+			// exam successfully update
             return UPDATE_SUCCESSFULLY;
         } else {
-            // Failed to update class
+            // Failed to update exam
             return UPDATE_FAILED;
         }
         
@@ -161,24 +117,23 @@ class StudentClassManagement {
     }
 	
 /**
-     * Delete class
+     * Delete exam
      *
-     * @param Int $clz_grade Class name for the system
-	 * @param String $clz_class Discription of the Class
+     * @param String $exm_name Exam name for the system
 	 * @param String $recode_added_by
      *
      * @return database transaction status
      */
-    public function deleteExam($clz_grade, $recode_added_by) {
+    public function deleteExam($exm_name, $recode_added_by) {
 
 		
         $response = array();
         // First check if exam already existed in db
-        if ($this->isExamExists($clz_grade)) {
+        if ($this->isExamExists($exm_name)) {
            			
 			//
 			$stmt = $this->conn->prepare("UPDATE exam set status = 3, recode_modified_at = now() , recode_modified_by = ? where exm_name = ? and status=1");
-			$stmt->bind_param("is",$recode_added_by, $clz_grade);
+			$stmt->bind_param("is",$recode_added_by, $exm_name);
 			$result = $stmt->execute();
 			
             $stmt->close();
@@ -231,13 +186,15 @@ class StudentClassManagement {
     }
   
   
+
+  
 	/**
      * Fetching all exams
 	 *
      * @return $exams boject set of all exams
      */
-    public function getAllClasses() {
-        $stmt = $this->conn->prepare("SELECT * FROM class WHERE status = 1 or status = 2 ORDER BY clz_grade ASC, clz_class ASC ");
+    public function getAllExams() {
+        $stmt = $this->conn->prepare("SELECT * FROM exam WHERE status = 1 or status = 2");
         $stmt->execute();
         $exams = $stmt->get_result();
         $stmt->close();
@@ -254,16 +211,15 @@ class StudentClassManagement {
  */
 
 	/**
-     * Checking for duplicate class by clz_grade and clz_class
+     * Checking for duplicate exam by exm_name
      *
-     * @param Int $clz_grade class grade to check in db
-     * @param String $clz_class class class to check in db
+     * @param String $exm_name exam name to check in db
+     *
      * @return boolean
      */
-    private function isStudentClassExists($year, $stu_id) {
-		//$exm_name = "exm1";
-		$stmt = $this->conn->prepare("SELECT year from student_class WHERE (status = 1 or  status = 2) and year = ? and stu_id = ?  ");
-        $stmt->bind_param("ii",$year, $stu_id);
+    private function isResultExists($stu_id, $exm_id, $year) {
+		$stmt = $this->conn->prepare("SELECT result from result WHERE (status = 1 or  status = 2) and stu_id = ? and exm_id = ? and year = ? ");
+        $stmt->bind_param("iii",$stu_id, $exm_id, $year);
         $stmt->execute();
 		$stmt->store_result();
         $num_rows = $stmt->num_rows;

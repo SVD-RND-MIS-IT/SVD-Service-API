@@ -7,7 +7,7 @@
  *
  */
 
-class ProjectManagement {
+class ProjectCatogoryManagement {
 
     private $conn;
 
@@ -192,12 +192,12 @@ class ProjectManagement {
 	 *
      * @return $projects object set of all projects
      */
-    public function getAllProjects() {
-        $stmt = $this->conn->prepare("SELECT * FROM project WHERE status = 1");
+    public function getAllProjectCatogories() {
+        $stmt = $this->conn->prepare("SELECT * FROM project_catogory WHERE status = 1 or status = 2");
         $stmt->execute();
-        $projects = $stmt->get_result();
+        $projectCatogories = $stmt->get_result();
         $stmt->close();
-        return $projects;
+        return $projectCatogories;
     }
 	
   

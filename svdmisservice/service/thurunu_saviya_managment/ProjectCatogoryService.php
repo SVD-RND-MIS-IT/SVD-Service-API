@@ -1,6 +1,6 @@
 <?php
 require_once '../../model/user_management/OperationalUserManagement.php';
-require_once '../../model/students_class_managment/StudentClassManagement.php';
+require_once '../../model/thurunu_saviya_managment/ProjectCatogoryManagement.php';
 require '../.././config/libs/Slim/Slim.php';
 
 \Slim\Slim::registerAutoloader();
@@ -48,119 +48,83 @@ function authenticate(\Slim\Route $route) {
 }
 
 /*
- * ------------------------ CLASS TABLE METHODS ------------------------
+ * ------------------------ PROJECT TABLE METHODS ------------------------
  */
  
 /**
- * Class Registration
- * url - /class_register
+ * Project Registration
+ * url - /project_register
  * method - POST
- * params - clz_grade, clz_class
+ * params - pro_name, pro_discription, pro_PDF_path, pro_supervisor_id
  */
-$app->post('/student_class_register',  function() use ($app) {
+$app->post('/project_register',   function() use ($app) {
 	
             // check for required params
-            verifyRequiredParams(array('year', 'stu_id', 'clz_id'));
+            verifyRequiredParams(array('pro_name', 'pro_year', 'pro_group_num' ));
 			
 			global $currunt_user_id;
 
             $response = array();
 
             // reading post params
-            $year = $app->request->post('year');
-            $stu_id = $app->request->post('stu_id');
-			$clz_id = $app->request->post('clz_id');
+            $pro_name = $app->request->post('pro_name');
+            $pro_discription = $app->request->post('pro_discription');
+			$pro_PDF_path = $app->request->post('pro_PDF_path');
+			$pro_supervisor_id = $app->request->post('pro_supervisor_id');
+			$pro_year = $app->request->post('pro_year');
+			$pro_group_num = $app->request->post('pro_group_num');
+			$pro_catogory = $app->request->post('pro_catogory');
            
-            $studentClassManagement = new StudentClassManagement();
-			$res = $studentClassManagement->createStudentClass($year, $stu_id, $clz_id, 1);
+            $projectManagement = new ProjectManagement();
+			$res = $projectManagement->createProject($pro_name, $pro_discription, $pro_year, $pro_group_num, $pro_catogory, $pro_PDF_path, $pro_supervisor_id, 1);
 			
             if ($res == CREATED_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "StudentClass is successfully registered";
+                $response["message"] = "Project is successfully registered";
             } else if ($res == CREATE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while registereing StudentClass";
+                $response["message"] = "Oops! An error occurred while registereing project";
             } else if ($res == ALREADY_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this StudentClass already exist";
+                $response["message"] = "Sorry, this project already exist";
             }
             // echo json response
             echoRespnse(201, $response);
         });
 
-		
-		
-		
-		
- 
 /**
- * Class Registration
- * url - /class_register
- * method - POST
- * params - clz_grade, clz_class
- */
-$app->post('/student_class_register_byADM',  function() use ($app) {
-	
-            // check for required params
-            verifyRequiredParams(array('year', 'stu_adm', 'clz_id'));
-			
-			global $currunt_user_id;
-
-            $response = array();
-
-            // reading post params
-            $year = $app->request->post('year');
-            $stu_adm = $app->request->post('stu_adm');
-			$clz_id = $app->request->post('clz_id');
-           
-            $studentClassManagement = new StudentClassManagement();
-			$res = $studentClassManagement->createStudentClass_byAdm($year, $stu_adm, $clz_id, 1);
-			
-            if ($res == CREATED_SUCCESSFULLY) {
-                $response["error"] = false;
-                $response["message"] = "StudentClass is successfully registered";
-            } else if ($res == CREATE_FAILED) {
-                $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while registereing StudentClass";
-            } else if ($res == ALREADY_EXISTED) {
-                $response["error"] = true;
-                $response["message"] = "Sorry, this StudentClass already exist";
-            }
-            // echo json response
-            echoRespnse(201, $response);
-        });
-		
-		
-/**
- * Exam Update
- * url - /exam_update/:examName
+ * Project Update
+ * url - /project_update
  * method - PUT
- * params - clz_grade, exm_discription
+ * params - pro_name, pro_discription, pro_PDF_path, pro_supervisor_id
  */
-$app->put('/exam_update/:examName',  'authenticate', function($clz_grade) use ($app) {
+$app->put('/project_update',  'authenticate', function() use ($app) {
 	
             // check for required params
-            verifyRequiredParams(array( 'exm_discription'));
+            verifyRequiredParams(array( 'pro_name','pro_discription', 'pro_PDF_path', 'pro_supervisor_id'));
 			
 			global $currunt_user_id;
 
             $response = array();
 
             // reading put params
-            $exm_discription = $app->request->put('exm_discription');
+			$pro_name = $app->request->put('pro_name'); 
+            $pro_discription = $app->request->put('pro_discription'); 
+			$pro_PDF_path = $app->request->put('pro_PDF_path'); 
+			$pro_supervisor_id = $app->request->put('pro_supervisor_id');
 
-            $examManagement = new ExamManagement();
-			$res = $examManagement->updateExam($exm_name, $exm_discription,$currunt_user_id);
+            $projectManagement = new ProjectManagement();
+			$res = $projectManagement->updateProject($pro_name, $pro_discription, $pro_PDF_path, $pro_supervisor_id, $currunt_user_id);
 			
             if ($res == UPDATE_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "You are successfully updated exam";
+                $response["message"] = "You are successfully updated Project";
             } else if ($res == UPDATE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while updating exam";
+                $response["message"] = "Oops! An error occurred while updating Project";
             } else if ($res == NOT_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this exam is not exist";
+                $response["message"] = "Sorry, this Project is not exist";
             }
             // echo json response
             echoRespnse(201, $response);
@@ -168,31 +132,36 @@ $app->put('/exam_update/:examName',  'authenticate', function($clz_grade) use ($
 
 
 /**
- * Exam Delete
- * url - /exam_delete
+ * Project Delete
+ * url - /project_delete
  * method - DELETE
- * params - exm_name/:examName
+ * params - pro_name
  */
-$app->delete('/exam_delete/:examName', 'authenticate', function($clz_grade) use ($app) {
+$app->delete('/project_delete', 'authenticate', function() use ($app) {
 	
-            
+            // check for required params
+            verifyRequiredParams(array( 'pro_name'));
+			
 			global $currunt_user_id;
 
+			// reading put params
+			$pro_name = $app->request->delete('pro_name'); 
+			
             $response = array();
 
 			
-            $examManagement = new ExamManagement();
-			$res = $examManagement->deleteExam($exm_name, $currunt_user_id);
+            $projectManagement = new ProjectManagement();
+			$res = $projectManagement->deleteProject($pro_name, $currunt_user_id);
 			
             if ($res == DELETE_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "Exam is successfully deleted";
+                $response["message"] = "Project is successfully deleted";
             } else if ($res == DELETE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while deleting exam";
+                $response["message"] = "Oops! An error occurred while deleting project";
             } else if ($res == NOT_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this exam is not exist";
+                $response["message"] = "Sorry, this project is not exist";
             }
             // echo json response
             echoRespnse(201, $response);
@@ -201,19 +170,19 @@ $app->delete('/exam_delete/:examName', 'authenticate', function($clz_grade) use 
 
 		
 /**
- * get one exam
+ * get one project
  * method GET
- * url /exam/:examName          
+ * url /project/:projectName          
  */
-$app->get('/exam/:examName', 'authenticate', function($clz_grade) {
+$app->get('/project/:projectName', 'authenticate', function($pro_name) {
             global $currunt_user_id;
             $response = array();
             
-			$examManagement = new ExamManagement();
-			$res = $examManagement->getExamByExamName($exm_name);
+			$projectManagement = new ProjectManagement();
+			$res = $projectManagement->getProjectByProjectName($pro_name);
 
             $response["error"] = false;
-            $response["exam"] = $res;
+            $response["project"] = $res;
 
             
 
@@ -221,30 +190,30 @@ $app->get('/exam/:examName', 'authenticate', function($clz_grade) {
         });
 
 /**
- * Listing all exams
+ * Listing all projects
  * method GET
- * url /exams        
+ * url /projects        
  */
-$app->get('/classes', 'authenticate', function() {
+$app->get('/project_catogories', function() {
             global $user_id;
 			
             $response = array();
 			
-            $classManagement = new ClassManagement();
-			$res = $classManagement->getAllClasses();
+            $projectCatogoryManagement = new ProjectCatogoryManagement();
+			$res = $projectCatogoryManagement->getAllProjectCatogories();
 
             $response["error"] = false;
-            $response["classes"] = array();
+            $response["projectCatogories"] = array();
 
-            // looping through result and preparing classes array
-            while ($classes = $res->fetch_assoc()) {
+            // looping through result and preparing projects array
+            while ($projectCatogories = $res->fetch_assoc()) {
                 $tmp = array();
 				
-                $tmp["clz_id"] = $classes["clz_id"];
-                $tmp["clz_grade"] = $classes["clz_grade"];
-                $tmp["clz_class"] = $classes["clz_class"];
-
-                array_push($response["classes"], $tmp);
+                $tmp["pro_cat_id"] = $projectCatogories["pro_cat_id"];
+                $tmp["pro_cat_name"] = $projectCatogories["pro_cat_name"];
+				$tmp["pro_cat_description"] = $projectCatogories["pro_cat_description"];
+				
+                array_push($response["projectCatogories"], $tmp);
             }
 
             echoRespnse(200, $response);
@@ -265,6 +234,10 @@ function verifyRequiredParams($required_fields) {
     $request_params = $_REQUEST;
     // Handling PUT request params
     if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
+        $app = \Slim\Slim::getInstance();
+        parse_str($app->request()->getBody(), $request_params);
+    }
+	if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
         $app = \Slim\Slim::getInstance();
         parse_str($app->request()->getBody(), $request_params);
     }

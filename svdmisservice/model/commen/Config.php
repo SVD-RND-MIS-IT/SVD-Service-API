@@ -3,9 +3,9 @@
  * Database configuration
  */
 define('DB_USERNAME', 'root');
-define('DB_PASSWORD', 'massa@123');
+define('DB_PASSWORD', '');
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'svdims');
+define('DB_NAME', 'svdmis');
 
 /**
  * Database transaction status

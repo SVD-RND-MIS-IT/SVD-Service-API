@@ -8,7 +8,7 @@ require_once '../../model/commen/PassHash.php';
  *
  */
 
-class StudentManagement {
+class RecommendationManagement {
 
     private $conn;
 
@@ -33,23 +33,15 @@ class StudentManagement {
      *
      * @return database transaction status
      */
-    public function createStudent($stu_admission_number, $stu_full_name, $stu_name_with_initisals, $stu_gender, $stu_date_of_birth, $stu_land_phone_number, $stu_mobile_number, $stu_address, $stu_city, $distance_to_home, $father_id, $mother_id, $guardian_id, $stu_email_address, $stu_nic_number, $recode_added_by) {
+    public function createRecommendation($rec_stu_id, $rec_year, $rec_type_id, $rec_topic, $rec_discription, $recode_added_by) {
 
         $response = array();
 		
-        // First check if Talant already existed in db
-        if (!$this->isStudentExists($stu_admission_number)) {
-  
-            // insert query
-			 $stmt = $this->conn->prepare("INSERT INTO student(stu_admission_number, stu_full_name, stu_name_with_initisals, stu_gender, stu_date_of_birth, stu_land_phone_number, stu_mobile_number, stu_address, stu_city, distance_to_home, father_id, mother_id, guardian_id, stu_email_address, stu_nic_number, recode_added_by) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-			 $stmt->bind_param("sssssssssiiiissi", $stu_admission_number, $stu_full_name, $stu_name_with_initisals, $stu_gender, $stu_date_of_birth, $stu_land_phone_number, $stu_mobile_number, $stu_address, $stu_city, $distance_to_home, $father_id, $mother_id, $guardian_id, $stu_email_address, $stu_nic_number, $recode_added_by );
-			 $result = $stmt->execute();
-			 $stmt->close();
-        } else {
-            // School is already existed in the db
-            return ALREADY_EXISTED;
-        }
-		
+        // insert query
+		$stmt = $this->conn->prepare("INSERT INTO recommendation(rec_stu_id, rec_year, rec_type_id, rec_topic, rec_discription, recode_added_by) values(?, ?, ?, ?, ?, ?)");
+		$stmt->bind_param("iiissi", $rec_stu_id, $rec_year, $rec_type_id, $rec_topic, $rec_discription,  $recode_added_by );
+		$result = $stmt->execute();
+		//$stmt->close();
          
 
         // Check for successful insertion
@@ -164,45 +156,6 @@ class StudentManagement {
             return NULL;
         }
     }
-	
-	
-	/**
-     * Fetching talants by tal_name
-	 *
-     * @param String $tal_name tal name
-	 *
-	 *@return talant object only needed data
-     */
-    public function getStudentByStudentFullName($stu_full_name) {
-        $stmt = $this->conn->prepare("call search_student_byName(?)");
-        $stmt->bind_param("s", $stu_full_name);
-		$stmt->execute();
-        $student = $stmt->get_result();
-        $stmt->close();
-        return $student;
-       /* if ($stmt->execute()) {
-            $stmt->bind_result($stu_id, $stu_admission_number, $stu_full_name, $stu_name_with_initisals, $name1, $name2, $name3, $stu_gender, 
-			 $stu_address, $stu_city);
-            $stmt->fetch();
-            $student = array();
-            $student["stu_id"] = $stu_id;
-            $student["stu_admission_number"] = $stu_admission_number;
-            $student["stu_full_name"] = $stu_full_name;
-			$student["stu_name_with_initisals"] = $stu_name_with_initisals;
-			$student["name1"] = $name1;
-            $student["name2"] = $name2;
-			$student["name3"] = $name3;
-			$student["stu_gender"] = $stu_gender;
-			$student["stu_date_of_birth"] = $stu_date_of_birth;
-			$student["stu_address"] = $stu_address;
-			$student["stu_city"] = $stu_city;
-
-            $stmt->close();
-            return $student;
-        } else {
-            return NULL;
-        }*/
-    }
   
   
 	/**
@@ -210,8 +163,8 @@ class StudentManagement {
 	 *
      * @return $talant object set of all talants
      */
-    public function getAllSchools() {
-        $stmt = $this->conn->prepare("SELECT * FROM school WHERE (status = 1 or  status = 2) ORDER BY sch_name");
+    public function getAllRecommendationTypes() {
+        $stmt = $this->conn->prepare("SELECT * FROM recommendation_type WHERE (status = 1 or  status = 2) ORDER BY rec_type_name");
         $stmt->execute();
         $talants = $stmt->get_result();
         $stmt->close();

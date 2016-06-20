@@ -7,7 +7,7 @@
  *
  */
 
-class ProjectManagement {
+class Grade9ThurunuSaviyaManagement {
 
     private $conn;
 
@@ -34,17 +34,17 @@ class ProjectManagement {
      *
      * @return database transaction status
      */
-    public function createProject($pro_name, $pro_discription, $pro_year, $pro_group_num, $pro_catogory, $pro_PDF_path, $pro_supervisor_id, $recode_added_by ) {
+    public function createGrade9ThurunuSaviya($stu_admission_number, $year, $ts9_group, $ts9_daily_attendance, $ts9_poya_attendance, $ts9_recomendation, $ts9_evaluation_cri_1, $ts9_evaluation_cri_2, $ts9_evaluation_cri_3, $ts9_evaluation_cri_4, $ts9_evaluation_cri_5, $ts9_evaluation_cri_6, $ts9_evaluation_cri_7, $ts9_evaluation_cri_8, $ts9_evaluation_cri_9, $ts9_evaluation_cri_10, $ts9_evaluation_cri_11, $ts9_evaluation_cri_12, $ts9_evaluation_cri_13, $ts9_evaluation_cri_14, $ts9_evaluation_cri_15, $ts9_evaluation_cri_16, $ts9_evaluation_cri_17, $ts9_evaluation_cri_18, $ts9_evaluation_cri_19, $ts9_evaluation_cri_20, $recode_added_by ) {
 
 		
         $response = array();
 		
         // First check if project already existed in db
-        if (!$this->isProjectExists($pro_name, $pro_year)) {
+        if (!$this->isProjectExists($pro_name)) {
   
             // insert query
-			 $stmt = $this->conn->prepare("INSERT INTO project(pro_name, pro_discription, pro_year, pro_group_num, pro_catogory, pro_PDF_path, pro_supervisor_id, recode_added_by) values(?, ?, ?, ?, ?, ?, ?, ?)");
-			 $stmt->bind_param("ssiiisii", $pro_name, $pro_discription, $pro_year, $pro_group_num, $pro_catogory, $pro_PDF_path, $pro_supervisor_id, $recode_added_by );
+			 $stmt = $this->conn->prepare("INSERT INTO project(pro_name, pro_discription, pro_PDF_path, pro_supervisor_id, recode_added_by) values(?, ?, ?, ?, ?)");
+			 $stmt->bind_param("sssii", $pro_name, $pro_discription, $pro_PDF_path, $pro_supervisor_id, $recode_added_by );
 			 $result = $stmt->execute();
 
 			 $stmt->close();
@@ -216,9 +216,9 @@ class ProjectManagement {
      *
      * @return boolean
      */
-    private function isProjectExists($pro_name, $pro_year) {
-		$stmt = $this->conn->prepare("SELECT pro_name from project WHERE (status = 1 or status = 1)  and pro_name = ?  and pro_year = ?");
-        $stmt->bind_param("si",$pro_name, $pro_year);
+    private function isProjectExists($pro_name) {
+		$stmt = $this->conn->prepare("SELECT pro_name from project WHERE (status = 1 or status = 1)  and pro_name = ?  ");
+        $stmt->bind_param("s",$pro_name);
         $stmt->execute();
 		$stmt->store_result();
         $num_rows = $stmt->num_rows;

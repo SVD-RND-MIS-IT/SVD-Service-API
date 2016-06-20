@@ -1,6 +1,6 @@
 <?php
 require_once '../../model/user_management/OperationalUserManagement.php';
-require_once '../../model/students_class_managment/StudentClassManagement.php';
+require_once '../../model/excelfeed/ExamResultManagement.php';
 require '../.././config/libs/Slim/Slim.php';
 
 \Slim\Slim::registerAutoloader();
@@ -48,96 +48,47 @@ function authenticate(\Slim\Route $route) {
 }
 
 /*
- * ------------------------ CLASS TABLE METHODS ------------------------
+ * ------------------------ EXAM TABLE METHODS ------------------------
  */
  
 /**
- * Class Registration
- * url - /class_register
+ * Exam Registration
+ * url - /exam_register
  * method - POST
- * params - clz_grade, clz_class
+ * params - exm_name, exm_discription
  */
-$app->post('/student_class_register',  function() use ($app) {
+$app->post('/result_register', function() use ($app) {
 	
             // check for required params
-            verifyRequiredParams(array('year', 'stu_id', 'clz_id'));
+            verifyRequiredParams(array('stu_id', 'exm_id', 'year', 'result'));
 			
 			global $currunt_user_id;
 
             $response = array();
 
             // reading post params
-            $year = $app->request->post('year');
             $stu_id = $app->request->post('stu_id');
-			$clz_id = $app->request->post('clz_id');
+            $exm_id = $app->request->post('exm_id');
+			$year = $app->request->post('year');
+            $result = $app->request->post('result');
+			$stu_exm_index_number = $app->request->post('stu_exm_index_number');
            
-            $studentClassManagement = new StudentClassManagement();
-			$res = $studentClassManagement->createStudentClass($year, $stu_id, $clz_id, 1);
+            $examResultManagement = new ExamResultManagement();
+			$res = $examResultManagement->createResult($stu_id, $exm_id, $year, $result, $stu_exm_index_number,1);
 			
-            if ($res == CREATED_SUCCESSFULLY) {
-                $response["error"] = false;
-                $response["message"] = "StudentClass is successfully registered";
-            } else if ($res == CREATE_FAILED) {
-                $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while registereing StudentClass";
-            } else if ($res == ALREADY_EXISTED) {
-                $response["error"] = true;
-                $response["message"] = "Sorry, this StudentClass already exist";
-            }
+            $response["error"] = false;
+            $response["exam_result_state"] = $res;
             // echo json response
             echoRespnse(201, $response);
         });
 
-		
-		
-		
-		
- 
-/**
- * Class Registration
- * url - /class_register
- * method - POST
- * params - clz_grade, clz_class
- */
-$app->post('/student_class_register_byADM',  function() use ($app) {
-	
-            // check for required params
-            verifyRequiredParams(array('year', 'stu_adm', 'clz_id'));
-			
-			global $currunt_user_id;
-
-            $response = array();
-
-            // reading post params
-            $year = $app->request->post('year');
-            $stu_adm = $app->request->post('stu_adm');
-			$clz_id = $app->request->post('clz_id');
-           
-            $studentClassManagement = new StudentClassManagement();
-			$res = $studentClassManagement->createStudentClass_byAdm($year, $stu_adm, $clz_id, 1);
-			
-            if ($res == CREATED_SUCCESSFULLY) {
-                $response["error"] = false;
-                $response["message"] = "StudentClass is successfully registered";
-            } else if ($res == CREATE_FAILED) {
-                $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while registereing StudentClass";
-            } else if ($res == ALREADY_EXISTED) {
-                $response["error"] = true;
-                $response["message"] = "Sorry, this StudentClass already exist";
-            }
-            // echo json response
-            echoRespnse(201, $response);
-        });
-		
-		
 /**
  * Exam Update
  * url - /exam_update/:examName
  * method - PUT
- * params - clz_grade, exm_discription
+ * params - exm_name, exm_discription
  */
-$app->put('/exam_update/:examName',  'authenticate', function($clz_grade) use ($app) {
+$app->put('/exam_update/:examName',  'authenticate', function($exm_name) use ($app) {
 	
             // check for required params
             verifyRequiredParams(array( 'exm_discription'));
@@ -173,7 +124,7 @@ $app->put('/exam_update/:examName',  'authenticate', function($clz_grade) use ($
  * method - DELETE
  * params - exm_name/:examName
  */
-$app->delete('/exam_delete/:examName', 'authenticate', function($clz_grade) use ($app) {
+$app->delete('/exam_delete/:examName', 'authenticate', function($exm_name) use ($app) {
 	
             
 			global $currunt_user_id;
@@ -205,7 +156,7 @@ $app->delete('/exam_delete/:examName', 'authenticate', function($clz_grade) use 
  * method GET
  * url /exam/:examName          
  */
-$app->get('/exam/:examName', 'authenticate', function($clz_grade) {
+$app->get('/exam/:examName', 'authenticate', function($exm_name) {
             global $currunt_user_id;
             $response = array();
             
@@ -225,26 +176,28 @@ $app->get('/exam/:examName', 'authenticate', function($clz_grade) {
  * method GET
  * url /exams        
  */
-$app->get('/classes', 'authenticate', function() {
+$app->get('/exams',  function() {
             global $user_id;
 			
             $response = array();
 			
-            $classManagement = new ClassManagement();
-			$res = $classManagement->getAllClasses();
+            $examManagement = new ExamManagement();
+			$res = $examManagement->getAllExams();
 
             $response["error"] = false;
-            $response["classes"] = array();
+            $response["exam"] = array();
 
-            // looping through result and preparing classes array
-            while ($classes = $res->fetch_assoc()) {
+            // looping through result and preparing exams array
+            while ($exam = $res->fetch_assoc()) {
                 $tmp = array();
+				$tmp["exm_id"] = $exam["exm_id"];
+                $tmp["exm_name"] = $exam["exm_name"];
+                $tmp["exm_discription"] = $exam["exm_discription"];
+                $tmp["status"] = $exam["status"];
+                $tmp["recode_added_at"] = $exam["recode_added_at"];
+				$tmp["recode_added_by"] = $exam["recode_added_by"];
 				
-                $tmp["clz_id"] = $classes["clz_id"];
-                $tmp["clz_grade"] = $classes["clz_grade"];
-                $tmp["clz_class"] = $classes["clz_class"];
-
-                array_push($response["classes"], $tmp);
+                array_push($response["exam"], $tmp);
             }
 
             echoRespnse(200, $response);

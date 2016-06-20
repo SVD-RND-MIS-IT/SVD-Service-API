@@ -162,6 +162,43 @@ $app->get('/student/:stu_admission_number',  function($stu_admission_number) {
 
             echoRespnse(200, $response);
         });
+		
+/**
+ * get one talant
+ * method GET
+ * url /talant/:talantsName       
+ */
+$app->get('/student_by_name/:stu_full_name',  function($stu_full_name) {
+
+            $response = array();
+            
+			$studentManagement = new StudentManagement();
+			$res = $studentManagement->getStudentByStudentFullName($stu_full_name);
+
+            $response["error"] = false;
+            $response["student"] = array();
+
+            // looping through result and preparing student array
+            while ($student = $res->fetch_assoc()) {
+                $tmp = array();
+				
+                $tmp["stu_id"] = $student["stu_id"];
+                $tmp["stu_admission_number"] = $student["stu_admission_number"];
+                $tmp["stu_full_name"] = $student["stu_full_name"];
+				$tmp["stu_name_with_initisals"] = $student["stu_name_with_initisals"];
+				$tmp["name1"] = $student["name1"];
+				$tmp["name2"] = $student["name2"];
+				$tmp["name3"] = $student["name3"];
+				$tmp["stu_gender"] = $student["stu_gender"];
+				$tmp["stu_date_of_birth"] = $student["stu_date_of_birth"];
+				$tmp["stu_address"] = $student["stu_address"];
+				$tmp["stu_city"] = $student["stu_city"];
+				
+                array_push($response["student"], $tmp);
+            }
+
+            echoRespnse(200, $response);
+        });
 
 /**
  * Listing all talants

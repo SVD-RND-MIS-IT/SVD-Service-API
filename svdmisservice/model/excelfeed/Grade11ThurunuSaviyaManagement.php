@@ -7,7 +7,7 @@
  *
  */
 
-class ProjectManagement {
+class Grade11ThurunuSaviyaManagement {
 
     private $conn;
 
@@ -34,28 +34,29 @@ class ProjectManagement {
      *
      * @return database transaction status
      */
-    public function createProject($pro_name, $pro_discription, $pro_year, $pro_group_num, $pro_catogory, $pro_PDF_path, $pro_supervisor_id, $recode_added_by ) {
+    public function createGrade11ThurunuSaviya($stu_admission_number, $year, $ts11_group, $ts11_daily_attendance, $ts11_poya_attendance, $ts11_recomendation, $ts11_evaluation_cri_1, $ts11_evaluation_cri_2, $ts11_evaluation_cri_3, $ts11_evaluation_cri_4, $ts11_evaluation_cri_5, $ts11_evaluation_cri_6, $ts11_evaluation_cri_7, $ts11_evaluation_cri_8, $ts11_evaluation_cri_9, $ts11_evaluation_cri_10, $ts11_evaluation_cri_11, $ts11_evaluation_cri_12, $ts11_evaluation_cri_13, $ts11_evaluation_cri_14, $ts11_evaluation_cri_15, $ts11_evaluation_cri_16, $ts11_evaluation_cri_17, $ts11_evaluation_cri_18, $ts11_evaluation_cri_19, $ts11_evaluation_cri_20,  $recode_added_by ) {
 
 		
         $response = array();
 		
-        // First check if project already existed in db
-        if (!$this->isProjectExists($pro_name, $pro_year)) {
-  
-            // insert query
-			 $stmt = $this->conn->prepare("INSERT INTO project(pro_name, pro_discription, pro_year, pro_group_num, pro_catogory, pro_PDF_path, pro_supervisor_id, recode_added_by) values(?, ?, ?, ?, ?, ?, ?, ?)");
-			 $stmt->bind_param("ssiiisii", $pro_name, $pro_discription, $pro_year, $pro_group_num, $pro_catogory, $pro_PDF_path, $pro_supervisor_id, $recode_added_by );
-			 $result = $stmt->execute();
-
-			 $stmt->close();
-
+        $stmt = $this->conn->prepare("call insert_tsgr11_report(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		$stmt->bind_param("sisiisiiiiiiiiiiiiiiiiiiiii", $stu_admission_number, $year, $ts11_group, $ts11_daily_attendance, $ts11_poya_attendance, $ts11_recomendation, $ts11_evaluation_cri_1, $ts11_evaluation_cri_2, $ts11_evaluation_cri_3, $ts11_evaluation_cri_4, $ts11_evaluation_cri_5, $ts11_evaluation_cri_6, $ts11_evaluation_cri_7, $ts11_evaluation_cri_8, $ts11_evaluation_cri_9, $ts11_evaluation_cri_10, $ts11_evaluation_cri_11, $ts11_evaluation_cri_12, $ts11_evaluation_cri_13, $ts11_evaluation_cri_14, $ts11_evaluation_cri_15, $ts11_evaluation_cri_16, $ts11_evaluation_cri_17, $ts11_evaluation_cri_18, $ts11_evaluation_cri_19, $ts11_evaluation_cri_20,  $recode_added_by);
+		if ($stmt->execute()) {
+            $stmt->bind_result($resultset);
+            $stmt->fetch();
+            $grade_11_thurunu_saviya_state = $resultset;
+            $stmt->close();
+            return $grade_11_thurunu_saviya_state;
         } else {
-            // Project is not already existed in the db
-            return ALREADY_EXISTED;
+            return NULL;
         }
 		
-         
+		
+		$result = $stmt->execute();
 
+		$stmt->close();
+
+        
         // Check for successful insertion
         if ($result) {
 			// project successfully inserted
@@ -216,9 +217,9 @@ class ProjectManagement {
      *
      * @return boolean
      */
-    private function isProjectExists($pro_name, $pro_year) {
-		$stmt = $this->conn->prepare("SELECT pro_name from project WHERE (status = 1 or status = 1)  and pro_name = ?  and pro_year = ?");
-        $stmt->bind_param("si",$pro_name, $pro_year);
+    private function isProjectExists($pro_name) {
+		$stmt = $this->conn->prepare("SELECT pro_name from project WHERE (status = 1 or status = 1)  and pro_name = ?  ");
+        $stmt->bind_param("s",$pro_name);
         $stmt->execute();
 		$stmt->store_result();
         $num_rows = $stmt->num_rows;
